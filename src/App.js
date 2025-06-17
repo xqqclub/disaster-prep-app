@@ -279,30 +279,15 @@ const QuizSection = ({ quizData }) => {
 };
 const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div style={styles.guideCard} className="guide-card"><div style={styles.guideHeader} className="guide-header" onClick={toggleExpand}><span style={styles.guideIcon}>{guide.icon}</span><h3 style={styles.guideTitle}>{guide.title}</h3><span style={styles.guideToggle}>{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div style={styles.guideContent}>{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} style={styles.guideHeading}>{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} style={styles.guideParagraph}>{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
 const ExportControls = ({ targetRef }) => {
+    // 修正：將 useState 移到組件的最頂層
     const [isExporting, setIsExporting] = useState(false);
 
-    const handleSaveAsImage = () => {
-        if (typeof html2canvas === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            document.head.appendChild(script);
-            script.onload = () => {
-                runHtml2Canvas();
-            };
-             script.onerror = () => {
-                alert('無法載入存圖工具，請檢查網路連線。');
-            }
-        } else {
-            runHtml2Canvas();
-        }
-    };
-
-    const runHtml2Canvas = () => {
-         const targetElement = targetRef.current;
+    const runHtml2Canvas = useCallback(() => {
+        const targetElement = targetRef.current;
         if (!targetElement) return;
 
         setIsExporting(true);
-        html2canvas(targetElement, {
+        window.html2canvas(targetElement, { // 修正：使用 window.html2canvas
             useCORS: true,
             backgroundColor: '#e9eef2',
             onclone: (doc) => {
@@ -323,7 +308,23 @@ const ExportControls = ({ targetRef }) => {
             console.error('oops, something went wrong!', err);
             setIsExporting(false);
         });
-    }
+    }, [targetRef]);
+
+    const handleSaveAsImage = useCallback(() => {
+        if (typeof window.html2canvas === 'undefined') { // 修正：檢查 window.html2canvas
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            document.head.appendChild(script);
+            script.onload = () => {
+                runHtml2Canvas();
+            };
+             script.onerror = () => {
+                alert('無法載入存圖工具，請檢查網路連線。');
+            }
+        } else {
+            runHtml2Canvas();
+        }
+    }, [runHtml2Canvas]);
 
     const handlePrint = () => {
         window.print();
