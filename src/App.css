@@ -36,3 +36,55 @@
     transform: rotate(360deg);
   }
 }
+
+/* 貼到 src/App.css */
+@keyframes countdown-float {
+    0% { transform: translateY(0); opacity: 0; }
+    25% { opacity: 0.3; }
+    50% { transform: translateY(-15px); opacity: 0.1; }
+    75% { opacity: 0.3; }
+    100% { transform: translateY(0); opacity: 0; }
+}
+
+@keyframes stamp-animation {
+    0% { transform: scale(1.8); opacity: 0; }
+    50% { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.item-container:hover .deleteButton { 
+    opacity: 1 !important; 
+    transform: translateY(-50%) scale(1) !important; 
+}
+
+.item-container:hover { background-color: #f9fafb; }
+.suggestionItem:hover { background-color: #f3f4f6; }
+.gemini-button:hover:not(:disabled) { background-color: #a78bfa; }
+.guide-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.07); }
+.quiz-option-button:hover { background-color: #f3f4f6; border-color: #a78bfa; }
+.quiz-button:hover { background-color: #60a5fa; }
+.export-button:hover { background-color: rgba(255,255,255,0.1); }
+.addItemInput:focus { border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3); outline: none;}
+.addItemButton:hover { background-color: #4b5563; }
+
+@media print {
+    body, .appContainer, .header, .footer, .guidesContainer {
+        visibility: hidden;
+    }
+    #printable-area, #printable-area * {
+        visibility: visible;
+    }
+    #printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .category-card {
+        page-break-inside: avoid;
+    }
+    .deleteButton, .cardFooter, .gemini-button {
+        display: none !important;
+    }
+}
+
