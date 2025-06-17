@@ -1,0 +1,4 @@
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "connect-src 'self' https://generativelanguage.googleapis.com;"
