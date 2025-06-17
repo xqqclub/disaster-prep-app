@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-
-// You would typically add this to your index.html or install it via npm.
-// For this self-contained example, we assume html2canvas is globally available.
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+import html2canvas from 'html2canvas';
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -224,7 +221,29 @@ const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div style=
 const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button style={styles.addItemButton} onClick={handleAdd}>新增</button></div>);};
 const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className="category-card" style={{...styles.categoryCard, ...(isCompleted ? styles.cardCompleted : {})}}><div style={styles.cardHeader}><span style={styles.cardIcon}>{icon}</span><h2 style={styles.cardTitle}>{category}</h2><span style={styles.cardCounter}>{`${preparedCount} / ${totalCount}`}</span></div><div style={styles.itemsList}>{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div style={styles.cardFooter}><button style={styles.geminiButton} className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
 const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewCategoryName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewCategoryName(''); } }; return (<div className="category-card" style={styles.aiCreatorCard}><h2 style={styles.cardTitle}><span style={styles.cardIcon}>🤖</span> 使用 AI 建立新的防災包</h2><p style={styles.aiCreatorDesc}>輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button style={{...styles.geminiButton, ...styles.geminiFullButton}} className="gemini-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
-const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => { if(!show) return null; const [selected, setSelected] = useState(new Set()); const handleToggle = (suggestion) => { setSelected(prev => { const newSet = new Set(prev); if(newSet.has(suggestion)) newSet.delete(suggestion); else newSet.add(suggestion); return newSet; }) }; const handleAddSelected = () => { onAdd(Array.from(selected)); onClose(); }; return (<div style={styles.modalBackdrop}><div style={styles.modalContent}><h2 style={styles.modalTitle}>給「{categoryName}」的智慧建議</h2><div style={styles.suggestionList}>{suggestions.map((s, i) => (<div key={i} className="suggestionItem" style={styles.suggestionItem} onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div style={styles.modalActions}><button style={styles.closeButton} onClick={onClose}>取消</button><button style={styles.addButton} onClick={handleAddSelected}>加入選取項目</button></div></div></div>);};
+const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
+    // 修正: 將 useState 移到最頂層
+    const [selected, setSelected] = useState(new Set());
+    
+    // 修正: 在 Hooks 之後才進行條件渲染
+    if(!show) return null;
+    
+    const handleToggle = (suggestion) => {
+        setSelected(prev => {
+            const newSet = new Set(prev);
+            if(newSet.has(suggestion)) newSet.delete(suggestion);
+            else newSet.add(suggestion);
+            return newSet;
+        })
+    };
+    
+    const handleAddSelected = () => {
+        onAdd(Array.from(selected));
+        onClose();
+    };
+
+    return (<div style={styles.modalBackdrop}><div style={styles.modalContent}><h2 style={styles.modalTitle}>給「{categoryName}」的智慧建議</h2><div style={styles.suggestionList}>{suggestions.map((s, i) => (<div key={i} className="suggestionItem" style={styles.suggestionItem} onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div style={styles.modalActions}><button style={styles.closeButton} onClick={onClose}>取消</button><button style={styles.addButton} onClick={handleAddSelected}>加入選取項目</button></div></div></div>);
+};
 const MorseCodeTable = () => { const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' }; return (<div style={styles.morseGrid}>{Object.entries(morseAlphabet).map(([char, code]) => (<div key={char} style={styles.morseItem}><strong style={styles.morseChar}>{char}</strong><span style={styles.morseCode}>{code}</span></div>))}</div>);};
 const ImageGallery = ({ images }) => (<div style={styles.galleryContainer}>{images.map((img, index) => (<figure key={index} style={styles.galleryFigure}><img src={img.src} alt={img.caption} style={styles.galleryImage} onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} /><figcaption style={styles.galleryCaption}>{img.caption}</figcaption></figure>))}</div>);
 const QuizResults = ({ score, total, onRestart }) => {
@@ -279,7 +298,6 @@ const QuizSection = ({ quizData }) => {
 };
 const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div style={styles.guideCard} className="guide-card"><div style={styles.guideHeader} className="guide-header" onClick={toggleExpand}><span style={styles.guideIcon}>{guide.icon}</span><h3 style={styles.guideTitle}>{guide.title}</h3><span style={styles.guideToggle}>{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div style={styles.guideContent}>{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} style={styles.guideHeading}>{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} style={styles.guideParagraph}>{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
 const ExportControls = ({ targetRef }) => {
-    // 修正：將 useState 移到組件的最頂層
     const [isExporting, setIsExporting] = useState(false);
 
     const runHtml2Canvas = useCallback(() => {
@@ -287,7 +305,7 @@ const ExportControls = ({ targetRef }) => {
         if (!targetElement) return;
 
         setIsExporting(true);
-        window.html2canvas(targetElement, { // 修正：使用 window.html2canvas
+        window.html2canvas(targetElement, {
             useCORS: true,
             backgroundColor: '#e9eef2',
             onclone: (doc) => {
@@ -311,7 +329,7 @@ const ExportControls = ({ targetRef }) => {
     }, [targetRef]);
 
     const handleSaveAsImage = useCallback(() => {
-        if (typeof window.html2canvas === 'undefined') { // 修正：檢查 window.html2canvas
+        if (typeof window.html2canvas === 'undefined') {
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
             document.head.appendChild(script);
