@@ -94,7 +94,7 @@ const survivalGuidesData = [
         icon: '🚨',
         content: [
             { type: 'heading', text: '地震來臨時 (DCH)：' },
-            { type: 'paragraph', text: '1. 趴下 (Drop)：壓低身體，以手肘和膝蓋著地。\n2. 掩護 (Cover)：尋找堅固的桌子底下躲避，或用手臂保護頭頸部。\n3. 穩住 (Hold On)：握住桌腳，直到搖晃停止。' },
+            { type: 'paragraph', text: '1. 趴下 (Drop)：壓低身体，以手肘和膝蓋著地。\n2. 掩護 (Cover)：尋找堅固的桌子底下躲避，或用手臂保護頭頸部。\n3. 穩住 (Hold On)：握住桌腳，直到搖晃停止。' },
             { type: 'heading', text: '戰爭或空襲警報時：' },
             { type: 'paragraph', text: '1. 進入室內：立即尋找最近的堅固建築物進入，遠離窗戶。\n2. 前往低處：優先選擇地下室或建築物低樓層。\n3. 資訊暢通：透過手機或收音機獲取官方發布的最新消息，切勿聽信謠言。\n4. 遠離目標：避免靠近政府機關、重要基礎設施等可能成為目標的地點。' },
         ],
@@ -654,7 +654,10 @@ export default function App() {
           <header className="header">
               <HeaderAnimation />
               <div className="header-content">
-                  <h1 className="title">AI 智慧防災準備指引</h1>
+                  <div className="title-container">
+                      <img src="/logo.png" alt="App Logo" className="header-logo" />
+                      <h1 className="title">AI 智慧防災準備指引</h1>
+                  </div>
                   <div className="progress-container">
                       <p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p>
                       <div className="progress-bar-container">
@@ -690,7 +693,10 @@ export default function App() {
               onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })}
               onAdd={handleAddSuggestions}
           />
-          <footer className="footer">© 2025 MAFTET</footer>
+          <footer className="footer">
+            <img src="/logo.png" alt="App Logo" className="footer-logo" />
+            <span>© 2025 MAFTET</span>
+          </footer>
       </div>
   );
 }
