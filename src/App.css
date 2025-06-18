@@ -67,6 +67,19 @@ code {
     animation-iteration-count: infinite;
 }
 
+.title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    height: 50px;
+    width: 50px;
+    border-radius: 8px;
+}
+
 .title {
     margin: 0;
     font-size: 2.5rem;
@@ -645,4 +658,38 @@ code {
     color: #9ca3af;
     background-color: #1f2937;
     flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-logo {
+    height: 24px;
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+    #main-content { /* Changed from .main-content to #main-content to match id */
+        display: block; 
+    }
+    .category-card, .ai-creator-card {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .title {
+        font-size: 1.8rem;
+    }
+    .header-logo {
+        height: 40px;
+        width: 40px;
+    }
+    .guidesMainTitle {
+        font-size: 1.6rem;
+    }
+    .guideTitle {
+        font-size: 1.1rem;
+    }
 }
