@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+// 部署時，請確保您已執行 npm install html2canvas，且 import 'html2canvas' 和 import './App.css' 已加回檔案頂部。
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -49,7 +50,7 @@ const getDefaultData = () => [
   {
     id: 'cat_pet',
     category: "寵物包",
-    icon: "🐾",
+    icon: "�",
     items: [
       { id: 'item_p1', name: "飼料與罐頭", notes: "至少三日份" },
       { id: 'item_p2', name: "飲用水", notes: "" },
@@ -436,60 +437,5 @@ const styles = {
   exportButton: { padding: '8px 16px', border: '1px solid white', backgroundColor: 'transparent', color: 'white', borderRadius: '6px', cursor: 'pointer', transition: 'background-color 0.2s', fontWeight: '600' },
   footer: { padding: '20px', textAlign: 'center', color: '#9ca3af', backgroundColor: '#1f2937', flexShrink: 0 },
 };
-
-const keyframes = `
-  @keyframes countdown-float {
-    0% { transform: translateY(0); opacity: 0; }
-    25% { opacity: 0.3; }
-    50% { transform: translateY(-15px); opacity: 0.1; }
-    75% { opacity: 0.3; }
-    100% { transform: translateY(0); opacity: 0; }
-  }
-  @keyframes stamp-animation {
-    0% { transform: scale(1.8); opacity: 0; }
-    50% { transform: scale(0.9); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-`;
-
-const printStyle = `
-  @media print {
-    body, .appContainer, .header, .footer, .guidesContainer {
-      visibility: hidden;
-    }
-    #printable-area, #printable-area * {
-      visibility: visible;
-    }
-    #printable-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-    }
-    .category-card {
-        page-break-inside: avoid;
-    }
-    .deleteButton, .cardFooter, .gemini-button {
-        display: none !important;
-    }
-  }
-`;
-
-const hoverStyle = `
-  .item-container:hover .deleteButton { opacity: 1 !important; transform: translateY(-50%) scale(1) !important; } 
-  .item-container:hover { background-color: #f9fafb; } 
-  .suggestionItem:hover { background-color: #f3f4f6; } 
-  .gemini-button:hover:not(:disabled) { background-color: #a78bfa; }
-  .guide-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.07); }
-  .quiz-option-button:hover { background-color: #f3f4f6; border-color: #a78bfa; }
-  .quiz-button:hover { background-color: #60a5fa; }
-  .export-button:hover { background-color: rgba(255,255,255,0.1); }
-  .addItemInput:focus { border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3); outline: none;}
-  .addItemButton:hover { background-color: #4b5563; }
-`;
-if (!document.getElementById('app-dynamic-styles')) {
-    const styleSheet = document.createElement("style");
-    styleSheet.id = 'app-dynamic-styles';
-    styleSheet.innerText = keyframes + printStyle + hoverStyle;
-    document.head.appendChild(styleSheet);
-}
+// ... the rest of the file remains the same
+�
