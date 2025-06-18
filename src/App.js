@@ -216,93 +216,14 @@ const HeaderAnimation = () => {
     );
 };
 
-const CustomCheckbox = ({ isChecked, onPress }) => (
-    <div className={`checkbox-base ${isChecked ? 'checkbox-checked' : ''}`} onClick={(e) => { e.stopPropagation(); onPress(); }}>
-        {isChecked && <span className="checkbox-checkmark">✓</span>}
-    </div>
-);
-
-const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => (
-    <div className="item-container" onClick={() => onToggle(item.id)}>
-        <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} />
-        <div className="item-text-container">
-            <p className={`item-name ${isChecked ? 'item-checked-text' : ''}`}>{item.name}</p>
-            {item.notes ? <p className={`item-notes ${isChecked ? 'item-checked-text' : ''}`}>{item.notes}</p> : null}
-        </div>
-        <div className="delete-button" onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div>
-    </div>
-);
-
-const AddItemForm = ({ onAddItem }) => {
-    const [newItemName, setNewItemName] = useState('');
-    const handleAdd = () => {
-        if (newItemName.trim()) {
-            onAddItem(newItemName.trim());
-            setNewItemName('');
-        }
-    };
-    return (
-        <div className="add-item-form">
-            <input type="text" className="add-item-input" placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/>
-            <button className="add-item-button" onClick={handleAdd}>新增</button>
-        </div>
-    );
-};
-
-const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => {
-    const { id, category, icon, items } = categoryData;
-    const preparedCount = items.filter(item => checkedItems.has(item.id)).length;
-    const totalCount = items.length;
-    const isCompleted = totalCount > 0 && preparedCount === totalCount;
-    return (
-        <div className={`category-card ${isCompleted ? 'card-completed' : ''}`}>
-            <div className="card-header">
-                <span className="card-icon">{icon}</span>
-                <h2 className="card-title">{category}</h2>
-                <span className="card-counter">{`${preparedCount} / ${totalCount}`}</span>
-            </div>
-            <div className="items-list">
-                {items.map(item => (
-                    <ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />
-                ))}
-            </div>
-            <div className="card-footer">
-                <button className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}>
-                    {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'}
-                </button>
-                <AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} />
-            </div>
-        </div>
-    );
-};
-
-const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => {
-    const [newCategoryName, setNewItemName] = useState('');
-    const handleGenerate = () => {
-        if(newCategoryName.trim()){
-            onGenerate(newCategoryName.trim());
-            setNewItemName('');
-        }
-    };
-    return (
-        <div className="category-card ai-creator-card">
-            <h2 className="card-title">
-                <span className="card-icon">🤖</span> 使用 AI 建立新的防災包
-            </h2>
-            <p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p>
-            <div className="add-item-form">
-                <input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} />
-                <button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}>
-                    {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'}
-                </button>
-            </div>
-        </div>
-    );
-};
-
+const CustomCheckbox = ({ isChecked, onPress }) => ( <div className={`checkbox-base ${isChecked ? 'checkbox-checked' : ''}`} onClick={(e) => { e.stopPropagation(); onPress(); }}>{isChecked && <span className="checkbox-checkmark">✓</span>}</div> );
+const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div className="item-container" onClick={() => onToggle(item.id)}> <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} /> <div className="item-text-container"><p className={`item-name ${isChecked ? 'item-checked-text' : ''}`}>{item.name}</p>{item.notes ? <p className={`item-notes ${isChecked ? 'item-checked-text' : ''}`}>{item.notes}</p> : null}</div> <div className="delete-button" onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div></div> );
+const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div className="add-item-form"><input type="text" className="add-item-input" placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button className="add-item-button" onClick={handleAdd}>新增</button></div>);};
+const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className={`category-card ${isCompleted ? 'card-completed' : ''}`}><div className="card-header"><span className="card-icon">{icon}</span><h2 className="card-title">{category}</h2><span className="card-counter">{`${preparedCount} / ${totalCount}`}</span></div><div className="items-list">{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div className="card-footer"><button className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
+const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewItemName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card ai-creator-card"><h2 className="card-title"><span className="card-icon">🤖</span> 使用 AI 建立新的防災包</h2><p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div className="add-item-form"><input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
     const [selected, setSelected] = useState(new Set());
-    
+
     useEffect(() => {
         if(show) {
             setSelected(new Set());
@@ -310,7 +231,7 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
     }, [show]);
 
     if(!show) return null;
-    
+
     const handleToggle = (suggestion) => {
         setSelected(prev => {
             const newSet = new Set(prev);
@@ -319,58 +240,16 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
             return newSet;
         })
     };
-    
+
     const handleAddSelected = () => {
         onAdd(Array.from(selected));
         onClose();
     };
 
-    return (
-        <div className="modal-backdrop">
-            <div className="modal-content">
-                <h2 className="modal-title">給「{categoryName}」的智慧建議</h2>
-                <div className="suggestion-list">
-                    {suggestions.map((s, i) => (
-                        <div key={i} className="suggestion-item" onClick={() => handleToggle(s)}>
-                            <CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} />
-                            <span>{s}</span>
-                        </div>
-                    ))}
-                </div>
-                <div className="modal-actions">
-                    <button className="close-button" onClick={onClose}>取消</button>
-                    <button className="add-button" onClick={handleAddSelected}>加入選取項目</button>
-                </div>
-            </div>
-        </div>
-    );
+    return (<div className="modal-backdrop"><div className="modal-content"><h2 className="modal-title">給「{categoryName}」的智慧建議</h2><div className="suggestion-list">{suggestions.map((s, i) => (<div key={i} className="suggestion-item" onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div className="modal-actions"><button className="close-button" onClick={onClose}>取消</button><button className="add-button" onClick={handleAddSelected}>加入選取項目</button></div></div></div>);
 };
-
-const MorseCodeTable = () => {
-    const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' };
-    return (
-        <div className="morse-grid">
-            {Object.entries(morseAlphabet).map(([char, code]) => (
-                <div key={char} className="morse-item">
-                    <strong className="morse-char">{char}</strong>
-                    <span className="morse-code">{code}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
-
-const ImageGallery = ({ images }) => (
-    <div className="gallery-container">
-        {images.map((img, index) => (
-            <figure key={index} className="gallery-figure">
-                <img src={img.src} alt={img.caption} className="gallery-image" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} />
-                <figcaption className="gallery-caption">{img.caption}</figcaption>
-            </figure>
-        ))}
-    </div>
-);
-
+const MorseCodeTable = () => { const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' }; return (<div className="morse-grid">{Object.entries(morseAlphabet).map(([char, code]) => (<div key={char} className="morse-item"><strong className="morse-char">{char}</strong><span className="morse-code">{code}</span></div>))}</div>);};
+const ImageGallery = ({ images }) => (<div className="gallery-container">{images.map((img, index) => (<figure key={index} className="gallery-figure"><img src={img.src} alt={img.caption} className="gallery-image" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} /><figcaption className="gallery-caption">{img.caption}</figcaption></figure>))}</div>);
 const QuizResults = ({ score, total, onRestart }) => {
     const percentage = (score / total) * 100;
     const calculateGrade = (p) => {
@@ -394,7 +273,6 @@ const QuizResults = ({ score, total, onRestart }) => {
         </div>
     );
 };
-
 const QuizSection = ({ quizData }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(null);
     const [userAnswers, setUserAnswers] = useState({});
@@ -412,13 +290,13 @@ const QuizSection = ({ quizData }) => {
             setCurrentQuestionIndex(null);
         }
     };
-    
+
     if (showResults) {
         const score = Object.keys(userAnswers).reduce((acc, index) => acc + (userAnswers[index] === quizData[index].correctAnswer ? 1 : 0), 0);
         return (<QuizResults score={score} total={quizData.length} onRestart={startQuiz} />);
     }
     if (currentQuestionIndex === null) return (<div className="quiz-container"><button onClick={startQuiz} className="quiz-button">開始知識測驗</button></div>);
-    
+
     const question = quizData[currentQuestionIndex];
     return (
         <div className="quiz-container">
@@ -432,33 +310,7 @@ const QuizSection = ({ quizData }) => {
         </div>
     );
 };
-
-const SurvivalGuideSection = ({ guide }) => {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const toggleExpand = () => setIsExpanded(!isExpanded);
-    return (
-        <div className="guide-card">
-            <div className="guide-header" onClick={toggleExpand}>
-                <span className="guide-icon">{guide.icon}</span>
-                <h3 className="guide-title">{guide.title}</h3>
-                <span className="guide-toggle">{isExpanded ? '收合' : '展開學習'}</span>
-            </div>
-            {isExpanded && (
-                <div className="guide-content">
-                    {guide.content.map((block, index) => {
-                        if (block.type === 'heading') return <h4 key={index} className="guide-heading">{block.text}</h4>;
-                        if (block.type === 'paragraph') return <p key={index} className="guide-paragraph">{block.text}</p>;
-                        if (block.type === 'morse_table') return <MorseCodeTable key={index} />;
-                        if (block.type === 'images') return <ImageGallery key={index} images={block.images} />;
-                        return null;
-                    })}
-                    {guide.quiz && <QuizSection quizData={guide.quiz} />}
-                </div>
-            )}
-        </div>
-    );
-};
-
+const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div className="guide-card"><div className="guide-header" onClick={toggleExpand}><span className="guide-icon">{guide.icon}</span><h3 className="guide-title">{guide.title}</h3><span className="guide-toggle">{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div className="guide-content">{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} className="guide-heading">{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} className="guide-paragraph">{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
 const ExportControls = ({ targetRef }) => {
     const [isExporting, setIsExporting] = useState(false);
 
@@ -668,35 +520,4 @@ export default function App() {
               </div>
           </header>
           <main id="printable-area" ref={printableRef} className="main-content">
-              {checklistData.map(categoryData => (
-                  <CategoryCard
-                      key={categoryData.id}
-                      categoryData={categoryData}
-                      checkedItems={checkedItems}
-                      onToggleItem={handleToggleItem}
-                      onAddItem={handleAddItem}
-                      onDeleteItem={handleDeleteItem}
-                      onGetSuggestions={handleGetSuggestions}
-                      isGeminiLoading={loadingState.suggestions}
-                  />
-              ))}
-              <AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} />
-          </main>
-          <section className="guides-container">
-              <h2 className="guides-main-title">生存技巧學習</h2>
-              {survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}
-          </section>
-          <SuggestionModal
-              show={suggestionModal.show}
-              suggestions={suggestionModal.suggestions}
-              categoryName={suggestionModal.categoryName}
-              onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })}
-              onAdd={handleAddSuggestions}
-          />
-          <footer className="footer">
-            <img src="/logo.png" alt="App Logo" className="footer-logo" />
-            <span>© 2025 MAFTET</span>
-          </footer>
-      </div>
-  );
-}
+              {checklistData
