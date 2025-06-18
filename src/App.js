@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import html2canvas from 'html2canvas';
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -222,10 +221,14 @@ const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = u
 const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className="category-card" style={{...styles.categoryCard, ...(isCompleted ? styles.cardCompleted : {})}}><div style={styles.cardHeader}><span style={styles.cardIcon}>{icon}</span><h2 style={styles.cardTitle}>{category}</h2><span style={styles.cardCounter}>{`${preparedCount} / ${totalCount}`}</span></div><div style={styles.itemsList}>{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div style={styles.cardFooter}><button style={styles.geminiButton} className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
 const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewCategoryName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewCategoryName(''); } }; return (<div className="category-card" style={styles.aiCreatorCard}><h2 style={styles.cardTitle}><span style={styles.cardIcon}>🤖</span> 使用 AI 建立新的防災包</h2><p style={styles.aiCreatorDesc}>輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button style={{...styles.geminiButton, ...styles.geminiFullButton}} className="gemini-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
-    // 修正: 將 useState 移到最頂層
     const [selected, setSelected] = useState(new Set());
     
-    // 修正: 在 Hooks 之後才進行條件渲染
+    useEffect(() => {
+        if(show) {
+            setSelected(new Set());
+        }
+    }, [show]);
+
     if(!show) return null;
     
     const handleToggle = (suggestion) => {
@@ -300,21 +303,14 @@ const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] 
 const ExportControls = ({ targetRef }) => {
     const [isExporting, setIsExporting] = useState(false);
 
-    const runHtml2Canvas = useCallback(() => {
+    const handleSaveAsImage = useCallback(() => {
         const targetElement = targetRef.current;
         if (!targetElement) return;
 
         setIsExporting(true);
-        window.html2canvas(targetElement, {
+        html2canvas(targetElement, {
             useCORS: true,
             backgroundColor: '#e9eef2',
-            onclone: (doc) => {
-                const cardContainer = doc.getElementById('printable-area');
-                if (cardContainer) {
-                    cardContainer.style.display = 'grid';
-                    cardContainer.style.gridTemplateColumns = 'repeat(auto-fill, minmax(320px, 1fr))';
-                }
-            }
         }).then(canvas => {
             const image = canvas.toDataURL("image/png", 1.0);
             const a = document.createElement('a');
@@ -327,22 +323,6 @@ const ExportControls = ({ targetRef }) => {
             setIsExporting(false);
         });
     }, [targetRef]);
-
-    const handleSaveAsImage = useCallback(() => {
-        if (typeof window.html2canvas === 'undefined') {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
-            document.head.appendChild(script);
-            script.onload = () => {
-                runHtml2Canvas();
-            };
-             script.onerror = () => {
-                alert('無法載入存圖工具，請檢查網路連線。');
-            }
-        } else {
-            runHtml2Canvas();
-        }
-    }, [runHtml2Canvas]);
 
     const handlePrint = () => {
         window.print();
@@ -368,7 +348,7 @@ export default function App() {
   const [suggestionModal, setSuggestionModal] = useState({ show: false, categoryId: null, categoryName: '', suggestions: [] });
   const printableRef = React.useRef(null);
 
-  const callGeminiAPI = async (prompt, jsonSchema = null) => { try { const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] }; if(jsonSchema) payload.generationConfig = { responseMimeType: "application/json", responseSchema: jsonSchema }; const apiKey = ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error(`API call failed with status: ${response.status}`); const result = await response.json(); if (result.candidates?.[0]?.content?.parts?.[0]) return result.candidates[0].content.parts[0].text; throw new Error("Invalid response structure from Gemini API"); } catch (error) { console.error("Gemini API call error:", error); alert(`與 Gemini 溝通時發生錯誤: ${error.message}`); return null; }};
+  const callGeminiAPI = async (prompt, jsonSchema = null) => { try { const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] }; if(jsonSchema) payload.generationConfig = { responseMimeType: "application/json", responseSchema: jsonSchema }; const apiKey = process.env.REACT_APP_GEMINI_API_KEY || ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error(`API call failed with status: ${response.status}`); const result = await response.json(); if (result.candidates?.[0]?.content?.parts?.[0]) return result.candidates[0].content.parts[0].text; throw new Error("Invalid response structure from Gemini API"); } catch (error) { console.error("Gemini API call error:", error); alert(`與 Gemini 溝通時發生錯誤: ${error.message}`); return null; }};
   useEffect(() => { try { const storedData = localStorage.getItem('disasterPrepData'); setChecklistData(storedData ? JSON.parse(storedData) : getDefaultData()); const storedCheckedItems = localStorage.getItem('disasterPrepCheckedItems'); if (storedCheckedItems) setCheckedItems(new Set(JSON.parse(storedCheckedItems))); } catch (e) { console.error("Failed to load data from localStorage", e); setChecklistData(getDefaultData()); }}, []);
   useEffect(() => { if(checklistData.length > 0) localStorage.setItem('disasterPrepData', JSON.stringify(checklistData)); }, [checklistData]);
   useEffect(() => { localStorage.setItem('disasterPrepCheckedItems', JSON.stringify(Array.from(checkedItems))); }, [checkedItems]);
