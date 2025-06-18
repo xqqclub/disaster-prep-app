@@ -19,7 +19,7 @@ const getDefaultData = () => [
   {
     id: 'cat2',
     category: "長輩包",
-    icon: "👴",
+    icon: "�",
     items: [
       { id: 'item11', name: "常備藥與藥盒", notes: "標示用法" },
       { id: 'item12', name: "老花眼鏡", notes: "" },
@@ -223,7 +223,7 @@ const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onD
 const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewItemName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card ai-creator-card"><h2 className="card-title"><span className="card-icon">🤖</span> 使用 AI 建立新的防災包</h2><p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div className="add-item-form"><input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
     const [selected, setSelected] = useState(new Set());
-
+    
     useEffect(() => {
         if(show) {
             setSelected(new Set());
@@ -231,7 +231,7 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
     }, [show]);
 
     if(!show) return null;
-
+    
     const handleToggle = (suggestion) => {
         setSelected(prev => {
             const newSet = new Set(prev);
@@ -240,7 +240,7 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
             return newSet;
         })
     };
-
+    
     const handleAddSelected = () => {
         onAdd(Array.from(selected));
         onClose();
@@ -290,13 +290,13 @@ const QuizSection = ({ quizData }) => {
             setCurrentQuestionIndex(null);
         }
     };
-
+    
     if (showResults) {
         const score = Object.keys(userAnswers).reduce((acc, index) => acc + (userAnswers[index] === quizData[index].correctAnswer ? 1 : 0), 0);
         return (<QuizResults score={score} total={quizData.length} onRestart={startQuiz} />);
     }
     if (currentQuestionIndex === null) return (<div className="quiz-container"><button onClick={startQuiz} className="quiz-button">開始知識測驗</button></div>);
-
+    
     const question = quizData[currentQuestionIndex];
     return (
         <div className="quiz-container">
@@ -357,7 +357,7 @@ export default function App() {
   const [checkedItems, setCheckedItems] = useState(new Set());
   const [loadingState, setLoadingState] = useState({ suggestions: false, creator: false });
   const [suggestionModal, setSuggestionModal] = useState({ show: false, categoryId: null, categoryName: '', suggestions: [] });
-  const printableRef = React.useRef(null);
+  const printableRef = useRef(null);
 
   const callGeminiAPI = async (prompt, jsonSchema = null) => {
       try {
@@ -497,4 +497,59 @@ export default function App() {
       }
   };
 
-  const totalItems
+  const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
+  const preparedItemsCount = checkedItems.size;
+  const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
+    
+  return (
+      <div className="app-container">
+          <header className="header">
+              <HeaderAnimation />
+              <div className="header-content">
+                  <div className="title-container">
+                      <img src="/logo.png" alt="App Logo" className="header-logo" />
+                      <h1 className="title">AI 智慧防災準備指引</h1>
+                  </div>
+                  <div className="progress-container">
+                      <p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p>
+                      <div className="progress-bar-container">
+                          <div style={{width: `${progress * 100}%`}} className="progress-bar" />
+                      </div>
+                  </div>
+                  <ExportControls targetRef={printableRef} />
+              </div>
+          </header>
+          <main id="printable-area" ref={printableRef} className="main-content">
+              {checklistData.map(categoryData => (
+                  <CategoryCard
+                      key={categoryData.id}
+                      categoryData={categoryData}
+                      checkedItems={checkedItems}
+                      onToggleItem={handleToggleItem}
+                      onAddItem={handleAddItem}
+                      onDeleteItem={handleDeleteItem}
+                      onGetSuggestions={handleGetSuggestions}
+                      isGeminiLoading={loadingState.suggestions}
+                  />
+              ))}
+              <AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} />
+          </main>
+          <section className="guides-container">
+              <h2 className="guides-main-title">生存技巧學習</h2>
+              {survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}
+          </section>
+          <SuggestionModal
+              show={suggestionModal.show}
+              suggestions={suggestionModal.suggestions}
+              categoryName={suggestionModal.categoryName}
+              onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })}
+              onAdd={handleAddSuggestions}
+          />
+          <footer className="footer">
+            <img src="/logo.png" alt="App Logo" className="footer-logo" />
+            <span>© 2025 MAFTET</span>
+          </footer>
+      </div>
+  );
+}
+�
