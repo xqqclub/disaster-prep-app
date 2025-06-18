@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import html2canvas from 'html2canvas';
+import './App.css';
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -66,7 +67,7 @@ const survivalGuidesData = [
     {
         id: 'guide0',
         title: '核心觀念：物資準備教學',
-        icon: '🥫',
+        icon: '�',
         content: [
             { type: 'heading', text: '新手常犯錯：錯把「日常食物」當成「戰備糧」' },
             { type: 'paragraph', text: '很多玩家看到自家冰箱滿滿的就覺得自己滿等了，但你沒理解到系統機制：\n戰時 = 限水限電模式開啟，所有靠電力生存的物資都會被自動卸載！\n\n你餐廳的食材、家裡冷凍的肉品，都是高危易腐資源，停電三天直接報銷。戰時你只會得到一堆「腐爛物資 ×99」。' },
@@ -220,7 +221,7 @@ const CustomCheckbox = ({ isChecked, onPress }) => ( <div style={{...styles.chec
 const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div style={styles.itemContainer} className="item-container" onClick={() => onToggle(item.id)}> <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} /> <div style={styles.itemTextContainer}><p style={{...styles.itemName, ...(isChecked ? styles.itemCheckedText : {})}}>{item.name}</p>{item.notes ? <p style={{...styles.itemNotes, ...(isChecked ? styles.itemCheckedText : {})}}>{item.notes}</p> : null}</div> <div className="deleteButton" style={styles.deleteButton} onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div></div> );
 const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button style={styles.addItemButton} onClick={handleAdd}>新增</button></div>);};
 const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className="category-card" style={{...styles.categoryCard, ...(isCompleted ? styles.cardCompleted : {})}}><div style={styles.cardHeader}><span style={styles.cardIcon}>{icon}</span><h2 style={styles.cardTitle}>{category}</h2><span style={styles.cardCounter}>{`${preparedCount} / ${totalCount}`}</span></div><div style={styles.itemsList}>{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div style={styles.cardFooter}><button style={styles.geminiButton} className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
-const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewCategoryName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewCategoryName(''); } }; return (<div className="category-card" style={styles.aiCreatorCard}><h2 style={styles.cardTitle}><span style={styles.cardIcon}>🤖</span> 使用 AI 建立新的防災包</h2><p style={styles.aiCreatorDesc}>輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button style={{...styles.geminiButton, ...styles.geminiFullButton}} className="gemini-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
+const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewCategoryName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card" style={styles.aiCreatorCard}><h2 style={styles.cardTitle}><span style={styles.cardIcon}>🤖</span> 使用 AI 建立新的防災包</h2><p style={styles.aiCreatorDesc}>輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button style={{...styles.geminiButton, ...styles.geminiFullButton}} className="gemini-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
     const [selected, setSelected] = useState(new Set());
     
@@ -360,7 +361,7 @@ export default function App() {
   const handleAddSuggestions = useCallback((itemsToAdd) => { if(!suggestionModal.categoryId) return; setChecklistData(prevData => prevData.map(cat => cat.id === suggestionModal.categoryId ? { ...cat, items: [...cat.items, ...itemsToAdd.map(name => ({ id: `item${Date.now()}_${name}`, name, notes: "AI建議" }))] } : cat));}, [suggestionModal.categoryId]);
   const handleCreateCategoryWithAI = async (categoryName) => { setLoadingState(s => ({...s, creator: true})); const schema = { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "STRING" }}}, required: ["items"]}; const prompt = `請為「${categoryName}」這個防災準備類別，生成一個包含5到8個建議物品的JSON清單。`; const resultJson = await callGeminiAPI(prompt, schema); setLoadingState(s => ({...s, creator: false})); if(resultJson) { try { const parsed = JSON.parse(resultJson); if(parsed.items && Array.isArray(parsed.items)) { setChecklistData(prev => [...prev, { id: `cat${Date.now()}`, category: categoryName, icon: '💡', items: parsed.items.map((name, i) => ({ id: `item${Date.now()}_${i}`, name, notes: "AI建立" }))}]); } } catch(e) { console.error("Failed to parse AI response:", e); alert("AI回傳的資料格式有誤，請稍後再試。"); }}};
   const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0); const preparedItemsCount = checkedItems.size; const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
-  return (<div style={styles.appContainer}><header style={styles.header}><HeaderAnimation /><div style={styles.headerContent}><h1 style={styles.title}>智慧防災準備指引</h1><div style={styles.progressContainer}><p style={styles.progressText}>總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div style={styles.progressBarContainer}><div style={{...styles.progressBar, width: `${progress * 100}%`}} /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} style={styles.mainContent}>{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section style={styles.guidesContainer}><h2 style={styles.guidesMainTitle}>生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer style={styles.footer}>© 2025 MAFTET</footer></div>);
+  return (<div style={styles.appContainer}><header style={styles.header}><HeaderAnimation /><div style={styles.headerContent}><h1 style={styles.title}>AI 智慧防災準備指引</h1><div style={styles.progressContainer}><p style={styles.progressText}>總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div style={styles.progressBarContainer}><div style={{...styles.progressBar, width: `${progress * 100}%`}} /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} style={styles.mainContent}>{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section style={styles.guidesContainer}><h2 style={styles.guidesMainTitle}>生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer style={styles.footer}>© 2025 MAFTET</footer></div>);
 }
 
 const styles = {
@@ -373,8 +374,8 @@ const styles = {
   progressText: { margin: '0 0 8px 0', fontSize: '1rem', textAlign: 'left', fontWeight: '500' },
   progressBarContainer: { height: 12, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 6, overflow: 'hidden' },
   progressBar: { height: '100%', backgroundColor: '#34d399', borderRadius: 6, transition: 'width 0.5s ease-in-out' },
-  mainContent: { display: 'flex', flexWrap: 'wrap', justifyContent: 'center', padding: '25px', gap: '25px' },
-  categoryCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', minWidth: '320px', width: 'calc(33.333% - 25px)', flex: '1 1 320px', display: 'flex', flexDirection: 'column', transition: 'all 0.3s ease-in-out', borderWidth: '1px', borderStyle: 'solid', borderColor: '#e5e7eb' },
+  mainContent: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', padding: '25px', gap: '25px' },
+  categoryCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', transition: 'all 0.3s ease-in-out', borderWidth: '1px', borderStyle: 'solid', borderColor: '#e5e7eb' },
   cardCompleted: { borderColor: '#34d399', boxShadow: '0 8px 15px rgba(52, 211, 153, 0.2)' },
   cardHeader: { display: 'flex', alignItems: 'center', padding: '15px 20px', borderBottom: '1px solid #f3f4f6', backgroundColor: '#f9fafb', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' },
   cardIcon: { fontSize: '1.8rem', marginRight: '15px' },
@@ -395,7 +396,7 @@ const styles = {
   addItemInput: { flex: 1, border: '1px solid #d1d5db', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', transition: 'border-color 0.2s, box-shadow 0.2s' },
   addItemButton: { marginLeft: '10px', padding: '8px 15px', border: 'none', borderRadius: '8px', backgroundColor: '#6b7280', color: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '14px', transition: 'background-color 0.2s' },
   geminiButton: { width: '100%', padding: '10px 15px', border: 'none', borderRadius: '8px', backgroundColor: '#8b5cf6', color: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '14px', transition: 'background-color 0.2s' },
-  aiCreatorCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', minWidth: '320px', width: 'calc(33.333% - 25px)', flex: '1 1 320px', padding: '20px', display: 'flex', flexDirection: 'column', border: '2px dashed #a78bfa' },
+  aiCreatorCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', minWidth: '320px', padding: '20px', display: 'flex', flexDirection: 'column', border: '2px dashed #a78bfa' },
   aiCreatorDesc: { color: '#4b5563', fontSize: '14px', lineHeight: 1.6, flexGrow: 1},
   geminiFullButton: { marginTop: '10px', width: 'auto', flexGrow: 1 },
   modalBackdrop: { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
@@ -436,60 +437,4 @@ const styles = {
   exportButton: { padding: '8px 16px', border: '1px solid white', backgroundColor: 'transparent', color: 'white', borderRadius: '6px', cursor: 'pointer', transition: 'background-color 0.2s', fontWeight: '600' },
   footer: { padding: '20px', textAlign: 'center', color: '#9ca3af', backgroundColor: '#1f2937', flexShrink: 0 },
 };
-
-const keyframes = `
-  @keyframes countdown-float {
-    0% { transform: translateY(0); opacity: 0; }
-    25% { opacity: 0.3; }
-    50% { transform: translateY(-15px); opacity: 0.1; }
-    75% { opacity: 0.3; }
-    100% { transform: translateY(0); opacity: 0; }
-  }
-  @keyframes stamp-animation {
-    0% { transform: scale(1.8); opacity: 0; }
-    50% { transform: scale(0.9); opacity: 1; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-`;
-
-const printStyle = `
-  @media print {
-    body, .appContainer, .header, .footer, .guidesContainer {
-      visibility: hidden;
-    }
-    #printable-area, #printable-area * {
-      visibility: visible;
-    }
-    #printable-area {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-    }
-    .category-card {
-        page-break-inside: avoid;
-    }
-    .deleteButton, .cardFooter, .gemini-button {
-        display: none !important;
-    }
-  }
-`;
-
-const hoverStyle = `
-  .item-container:hover .deleteButton { opacity: 1 !important; transform: translateY(-50%) scale(1) !important; } 
-  .item-container:hover { background-color: #f9fafb; } 
-  .suggestionItem:hover { background-color: #f3f4f6; } 
-  .gemini-button:hover:not(:disabled) { background-color: #a78bfa; }
-  .guide-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.07); }
-  .quiz-option-button:hover { background-color: #f3f4f6; border-color: #a78bfa; }
-  .quiz-button:hover { background-color: #60a5fa; }
-  .export-button:hover { background-color: rgba(255,255,255,0.1); }
-  .addItemInput:focus { border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3); outline: none;}
-  .addItemButton:hover { background-color: #4b5563; }
-`;
-if (!document.getElementById('app-dynamic-styles')) {
-    const styleSheet = document.createElement("style");
-    styleSheet.id = 'app-dynamic-styles';
-    styleSheet.innerText = keyframes + printStyle + hoverStyle;
-    document.head.appendChild(styleSheet);
-}
+�
