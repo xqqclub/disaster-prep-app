@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// 部署時，請確保您已執行 npm install html2canvas，且 import 'html2canvas' 和 import './App.css' 已加回檔案頂部。
+import html2canvas from 'html2canvas';
+import './App.css';
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -50,7 +51,7 @@ const getDefaultData = () => [
   {
     id: 'cat_pet',
     category: "寵物包",
-    icon: "�",
+    icon: "🐾",
     items: [
       { id: 'item_p1', name: "飼料與罐頭", notes: "至少三日份" },
       { id: 'item_p2', name: "飲用水", notes: "" },
@@ -122,7 +123,7 @@ const survivalGuidesData = [
             { question: '設置簡易預警裝置的主要目的是什麼？', options: ['捕捉小動物當食物', '在有入侵者時提早知道', '裝飾避難所'], correctAnswer: 1 },
             { question: '在城市中移動時，以下哪種行為比較安全？', options: ['走在寬闊的大馬路上', '穿著鮮豔的衣服讓搜救隊容易看到', '沿著小巷或建築物陰影處移動'], correctAnswer: 2 },
             { question: '停電時，冰箱裡的食物應該如何處理？', options: ['盡量不要打開冰箱門', '優先處理冷藏區的食物', '以上皆是'], correctAnswer: 2 },
-            { type: 'paragraph', text: '以下何者不是保持低調的好方法？' , options:['夜間使用明亮的手電筒','減少活動產生的垃圾','與鄰居建立通訊管道'], correctAnswer: 0}
+            { question: '以下何者不是保持低調的好方法？' , options:['夜間使用明亮的手電筒','減少活動產生的垃圾','與鄰居建立通訊管道'], correctAnswer: 0}
         ]
     },
     {
@@ -153,7 +154,7 @@ const survivalGuidesData = [
     {
         id: 'guide3',
         title: '摩斯密碼教學',
-        icon: '📡',
+        icon: '�',
         content: [
            { type: 'paragraph', text: '摩斯密碼是一種國際通用的求救信號。基本原則是：短音「點」(.)、長音「劃」(-)，劃的長度約為點的3倍。字母間隔為一劃長，單字間隔為三劃長。' },
            { type: 'heading', text: '國際通用求救信號 (SOS)：' },
@@ -437,5 +438,6 @@ const styles = {
   exportButton: { padding: '8px 16px', border: '1px solid white', backgroundColor: 'transparent', color: 'white', borderRadius: '6px', cursor: 'pointer', transition: 'background-color 0.2s', fontWeight: '600' },
   footer: { padding: '20px', textAlign: 'center', color: '#9ca3af', backgroundColor: '#1f2937', flexShrink: 0 },
 };
+
 // ... the rest of the file remains the same
 �
