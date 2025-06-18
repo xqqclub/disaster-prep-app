@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import './App.css';
 
@@ -497,27 +497,4 @@ export default function App() {
       }
   };
 
-  const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
-  const preparedItemsCount = checkedItems.size;
-  const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
-
-  return (
-      <div className="app-container">
-          <header className="header">
-              <HeaderAnimation />
-              <div className="header-content">
-                  <div className="title-container">
-                      <img src="/logo.png" alt="App Logo" className="header-logo" />
-                      <h1 className="title">AI 智慧防災準備指引</h1>
-                  </div>
-                  <div className="progress-container">
-                      <p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p>
-                      <div className="progress-bar-container">
-                          <div style={{width: `${progress * 100}%`}} className="progress-bar" />
-                      </div>
-                  </div>
-                  <ExportControls targetRef={printableRef} />
-              </div>
-          </header>
-          <main id="printable-area" ref={printableRef} className="main-content">
-              {checklistData
+  const totalItems
