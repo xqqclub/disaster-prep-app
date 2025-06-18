@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import html2canvas from 'html2canvas';
-import './App.css';
 
 // --- 預設資料區 (只在第一次載入時使用) ---
 const getDefaultData = () => [
@@ -19,7 +18,7 @@ const getDefaultData = () => [
   {
     id: 'cat2',
     category: "長輩包",
-    icon: "�",
+    icon: "👴",
     items: [
       { id: 'item11', name: "常備藥與藥盒", notes: "標示用法" },
       { id: 'item12', name: "老花眼鏡", notes: "" },
@@ -494,4 +493,3 @@ if (!document.getElementById('app-dynamic-styles')) {
     styleSheet.innerText = keyframes + printStyle + hoverStyle;
     document.head.appendChild(styleSheet);
 }
-�
