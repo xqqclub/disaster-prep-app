@@ -67,7 +67,7 @@ const survivalGuidesData = [
     {
         id: 'guide0',
         title: '核心觀念：物資準備教學',
-        icon: '�',
+        icon: '🥫',
         content: [
             { type: 'heading', text: '新手常犯錯：錯把「日常食物」當成「戰備糧」' },
             { type: 'paragraph', text: '很多玩家看到自家冰箱滿滿的就覺得自己滿等了，但你沒理解到系統機制：\n戰時 = 限水限電模式開啟，所有靠電力生存的物資都會被自動卸載！\n\n你餐廳的食材、家裡冷凍的肉品，都是高危易腐資源，停電三天直接報銷。戰時你只會得到一堆「腐爛物資 ×99」。' },
@@ -196,32 +196,28 @@ const HeaderAnimation = () => {
         const generatedTimers = Array.from({ length: 20 }).map(() => ({
             id: Math.random(),
             value: (Math.random() * 99).toFixed(2),
-            style: {
-                position: 'absolute',
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                fontSize: `${Math.random() * 16 + 8}px`,
-                opacity: Math.random() * 0.3,
-                animation: `countdown-float ${Math.random() * 10 + 5}s infinite linear`,
-                animationDelay: `${Math.random() * 5}s`,
-            }
         }));
         setTimers(generatedTimers);
     }, []);
 
     return (
-        <div style={styles.headerAnimationContainer}>
+        <div className="header-animation-container">
             {timers.map(timer => (
-                <span key={timer.id} style={timer.style}>{timer.value}</span>
+                <span key={timer.id} className="header-timer" style={{
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    fontSize: `${Math.random() * 16 + 8}px`,
+                    animationDelay: `${Math.random() * 5}s`,
+                }}>{timer.value}</span>
             ))}
         </div>
     );
 };
-const CustomCheckbox = ({ isChecked, onPress }) => ( <div style={{...styles.checkboxBase, ...(isChecked ? styles.checkboxChecked : {})}} onClick={(e) => { e.stopPropagation(); onPress(); }}>{isChecked && <span style={styles.checkboxCheckmark}>✓</span>}</div> );
-const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div style={styles.itemContainer} className="item-container" onClick={() => onToggle(item.id)}> <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} /> <div style={styles.itemTextContainer}><p style={{...styles.itemName, ...(isChecked ? styles.itemCheckedText : {})}}>{item.name}</p>{item.notes ? <p style={{...styles.itemNotes, ...(isChecked ? styles.itemCheckedText : {})}}>{item.notes}</p> : null}</div> <div className="deleteButton" style={styles.deleteButton} onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div></div> );
-const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button style={styles.addItemButton} onClick={handleAdd}>新增</button></div>);};
-const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className="category-card" style={{...styles.categoryCard, ...(isCompleted ? styles.cardCompleted : {})}}><div style={styles.cardHeader}><span style={styles.cardIcon}>{icon}</span><h2 style={styles.cardTitle}>{category}</h2><span style={styles.cardCounter}>{`${preparedCount} / ${totalCount}`}</span></div><div style={styles.itemsList}>{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div style={styles.cardFooter}><button style={styles.geminiButton} className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
-const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewCategoryName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card" style={styles.aiCreatorCard}><h2 style={styles.cardTitle}><span style={styles.cardIcon}>🤖</span> 使用 AI 建立新的防災包</h2><p style={styles.aiCreatorDesc}>輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div style={styles.addItemForm}><input type="text" style={styles.addItemInput} placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button style={{...styles.geminiButton, ...styles.geminiFullButton}} className="gemini-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
+const CustomCheckbox = ({ isChecked, onPress }) => ( <div className={`checkbox-base ${isChecked ? 'checkbox-checked' : ''}`} onClick={(e) => { e.stopPropagation(); onPress(); }}>{isChecked && <span className="checkbox-checkmark">✓</span>}</div> );
+const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div className="item-container" onClick={() => onToggle(item.id)}> <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} /> <div className="item-text-container"><p className={`item-name ${isChecked ? 'item-checked-text' : ''}`}>{item.name}</p>{item.notes ? <p className={`item-notes ${isChecked ? 'item-checked-text' : ''}`}>{item.notes}</p> : null}</div> <div className="delete-button" onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div></div> );
+const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div className="add-item-form"><input type="text" className="add-item-input" placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button className="add-item-button" onClick={handleAdd}>新增</button></div>);};
+const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className={`category-card ${isCompleted ? 'card-completed' : ''}`}><div className="card-header"><span className="card-icon">{icon}</span><h2 className="card-title">{category}</h2><span className="card-counter">{`${preparedCount} / ${totalCount}`}</span></div><div className="items-list">{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div className="card-footer"><button className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
+const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewItemName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card ai-creator-card"><h2 className="card-title"><span className="card-icon">🤖</span> 使用 AI 建立新的防災包</h2><p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div className="add-item-form"><input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
     const [selected, setSelected] = useState(new Set());
     
@@ -247,10 +243,10 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
         onClose();
     };
 
-    return (<div style={styles.modalBackdrop}><div style={styles.modalContent}><h2 style={styles.modalTitle}>給「{categoryName}」的智慧建議</h2><div style={styles.suggestionList}>{suggestions.map((s, i) => (<div key={i} className="suggestionItem" style={styles.suggestionItem} onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div style={styles.modalActions}><button style={styles.closeButton} onClick={onClose}>取消</button><button style={styles.addButton} onClick={handleAddSelected}>加入選取項目</button></div></div></div>);
+    return (<div className="modal-backdrop"><div className="modal-content"><h2 className="modal-title">給「{categoryName}」的智慧建議</h2><div className="suggestion-list">{suggestions.map((s, i) => (<div key={i} className="suggestion-item" onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div className="modal-actions"><button className="close-button" onClick={onClose}>取消</button><button className="add-button" onClick={handleAddSelected}>加入選取項目</button></div></div></div>);
 };
-const MorseCodeTable = () => { const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' }; return (<div style={styles.morseGrid}>{Object.entries(morseAlphabet).map(([char, code]) => (<div key={char} style={styles.morseItem}><strong style={styles.morseChar}>{char}</strong><span style={styles.morseCode}>{code}</span></div>))}</div>);};
-const ImageGallery = ({ images }) => (<div style={styles.galleryContainer}>{images.map((img, index) => (<figure key={index} style={styles.galleryFigure}><img src={img.src} alt={img.caption} style={styles.galleryImage} onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} /><figcaption style={styles.galleryCaption}>{img.caption}</figcaption></figure>))}</div>);
+const MorseCodeTable = () => { const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' }; return (<div className="morse-grid">{Object.entries(morseAlphabet).map(([char, code]) => (<div key={char} className="morse-item"><strong className="morse-char">{char}</strong><span className="morse-code">{code}</span></div>))}</div>);};
+const ImageGallery = ({ images }) => (<div className="gallery-container">{images.map((img, index) => (<figure key={index} className="gallery-figure"><img src={img.src} alt={img.caption} className="gallery-image" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} /><figcaption className="gallery-caption">{img.caption}</figcaption></figure>))}</div>);
 const QuizResults = ({ score, total, onRestart }) => {
     const percentage = (score / total) * 100;
     const calculateGrade = (p) => {
@@ -264,13 +260,13 @@ const QuizResults = ({ score, total, onRestart }) => {
     const { grade, color } = calculateGrade(percentage);
 
     return (
-        <div style={styles.quizResultsContainer}>
-            <div style={{...styles.gradeStamp, borderColor: color}} className="grade-stamp-animation">
-                <span style={{ ...styles.gradeText, color: color }}>{grade}</span>
+        <div className="quiz-results-container">
+            <div className="grade-stamp-animation" style={{borderColor: color}}>
+                <span className="grade-text" style={{color: color}}>{grade}</span>
             </div>
             <h4>測驗完成！</h4>
             <p>您的成績： {score} / {total} 題正確</p>
-            <button onClick={onRestart} style={styles.quizButton} className="quiz-button">再測一次</button>
+            <button onClick={onRestart} className="quiz-button">再測一次</button>
         </div>
     );
 };
@@ -296,12 +292,12 @@ const QuizSection = ({ quizData }) => {
         const score = Object.keys(userAnswers).reduce((acc, index) => acc + (userAnswers[index] === quizData[index].correctAnswer ? 1 : 0), 0);
         return (<QuizResults score={score} total={quizData.length} onRestart={startQuiz} />);
     }
-    if (currentQuestionIndex === null) return (<div style={styles.quizContainer}><button onClick={startQuiz} style={styles.quizButton} className="quiz-button">開始知識測驗</button></div>);
+    if (currentQuestionIndex === null) return (<div className="quiz-container"><button onClick={startQuiz} className="quiz-button">開始知識測驗</button></div>);
     
     const question = quizData[currentQuestionIndex];
-    return (<div style={styles.quizContainer}><h4>問題 {currentQuestionIndex + 1}/{quizData.length}</h4><p style={styles.quizQuestion}>{question.question}</p><div style={styles.quizOptions}>{question.options.map((option, index) => (<button key={index} onClick={() => handleAnswer(index)} className="quiz-option-button" style={styles.quizOptionButton}>{option}</button>))}</div></div>);
+    return (<div className="quiz-container"><h4>問題 {currentQuestionIndex + 1}/{quizData.length}</h4><p className="quiz-question">{question.question}</p><div className="quiz-options">{question.options.map((option, index) => (<button key={index} onClick={() => handleAnswer(index)} className="quiz-option-button">{option}</button>))}</div></div>);
 };
-const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div style={styles.guideCard} className="guide-card"><div style={styles.guideHeader} className="guide-header" onClick={toggleExpand}><span style={styles.guideIcon}>{guide.icon}</span><h3 style={styles.guideTitle}>{guide.title}</h3><span style={styles.guideToggle}>{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div style={styles.guideContent}>{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} style={styles.guideHeading}>{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} style={styles.guideParagraph}>{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
+const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div className="guide-card"><div className="guide-header" onClick={toggleExpand}><span className="guide-icon">{guide.icon}</span><h3 className="guide-title">{guide.title}</h3><span className="guide-toggle">{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div className="guide-content">{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} className="guide-heading">{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} className="guide-paragraph">{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
 const ExportControls = ({ targetRef }) => {
     const [isExporting, setIsExporting] = useState(false);
 
@@ -312,7 +308,7 @@ const ExportControls = ({ targetRef }) => {
         setIsExporting(true);
         html2canvas(targetElement, {
             useCORS: true,
-            backgroundColor: '#e9eef2',
+            backgroundColor: '#f0f2f5',
         }).then(canvas => {
             const image = canvas.toDataURL("image/png", 1.0);
             const a = document.createElement('a');
@@ -331,11 +327,11 @@ const ExportControls = ({ targetRef }) => {
     };
 
     return (
-        <div style={styles.exportControls}>
-            <button onClick={handleSaveAsImage} style={styles.exportButton} className="export-button" disabled={isExporting}>
+        <div className="export-controls">
+            <button onClick={handleSaveAsImage} className="export-button" disabled={isExporting}>
                 {isExporting ? '處理中...' : '存為圖片'}
             </button>
-            <button onClick={handlePrint} style={styles.exportButton} className="export-button">
+            <button onClick={handlePrint} className="export-button">
                 列印清單
             </button>
         </div>
@@ -361,80 +357,5 @@ export default function App() {
   const handleAddSuggestions = useCallback((itemsToAdd) => { if(!suggestionModal.categoryId) return; setChecklistData(prevData => prevData.map(cat => cat.id === suggestionModal.categoryId ? { ...cat, items: [...cat.items, ...itemsToAdd.map(name => ({ id: `item${Date.now()}_${name}`, name, notes: "AI建議" }))] } : cat));}, [suggestionModal.categoryId]);
   const handleCreateCategoryWithAI = async (categoryName) => { setLoadingState(s => ({...s, creator: true})); const schema = { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "STRING" }}}, required: ["items"]}; const prompt = `請為「${categoryName}」這個防災準備類別，生成一個包含5到8個建議物品的JSON清單。`; const resultJson = await callGeminiAPI(prompt, schema); setLoadingState(s => ({...s, creator: false})); if(resultJson) { try { const parsed = JSON.parse(resultJson); if(parsed.items && Array.isArray(parsed.items)) { setChecklistData(prev => [...prev, { id: `cat${Date.now()}`, category: categoryName, icon: '💡', items: parsed.items.map((name, i) => ({ id: `item${Date.now()}_${i}`, name, notes: "AI建立" }))}]); } } catch(e) { console.error("Failed to parse AI response:", e); alert("AI回傳的資料格式有誤，請稍後再試。"); }}};
   const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0); const preparedItemsCount = checkedItems.size; const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
-  return (<div style={styles.appContainer}><header style={styles.header}><HeaderAnimation /><div style={styles.headerContent}><h1 style={styles.title}>AI 智慧防災準備指引</h1><div style={styles.progressContainer}><p style={styles.progressText}>總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div style={styles.progressBarContainer}><div style={{...styles.progressBar, width: `${progress * 100}%`}} /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} style={styles.mainContent}>{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section style={styles.guidesContainer}><h2 style={styles.guidesMainTitle}>生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer style={styles.footer}>© 2025 MAFTET</footer></div>);
+  return (<div className="app-container"><header className="header"><HeaderAnimation /><div className="header-content"><h1 className="title">AI 智慧防災準備指引</h1><div className="progress-container"><p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div className="progress-bar-container"><div style={{width: `${progress * 100}%`}} className="progress-bar" /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} className="main-content">{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section className="guides-container"><h2 className="guides-main-title">生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer className="footer">© 2025 MAFTET</footer></div>);
 }
-
-const styles = {
-  appContainer: { fontFamily: '"Inter", "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
-  header: { padding: '20px', backgroundColor: '#1f2937', color: 'white', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', flexShrink: 0, position: 'relative', overflow: 'hidden' },
-  headerContent: { position: 'relative', zIndex: 2 },
-  headerAnimationContainer: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'none', color: 'rgba(255, 255, 255, 0.2)' },
-  title: { margin: 0, fontSize: '2.8rem', fontWeight: '800', letterSpacing: '1px', textShadow: '0 2px 4px rgba(0,0,0,0.5)' },
-  progressContainer: { maxWidth: '600px', margin: '15px auto 0 auto' },
-  progressText: { margin: '0 0 8px 0', fontSize: '1rem', textAlign: 'left', fontWeight: '500' },
-  progressBarContainer: { height: 12, backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: 6, overflow: 'hidden' },
-  progressBar: { height: '100%', backgroundColor: '#34d399', borderRadius: 6, transition: 'width 0.5s ease-in-out' },
-  mainContent: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', padding: '25px', gap: '25px' },
-  categoryCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', display: 'flex', flexDirection: 'column', transition: 'all 0.3s ease-in-out', borderWidth: '1px', borderStyle: 'solid', borderColor: '#e5e7eb' },
-  cardCompleted: { borderColor: '#34d399', boxShadow: '0 8px 15px rgba(52, 211, 153, 0.2)' },
-  cardHeader: { display: 'flex', alignItems: 'center', padding: '15px 20px', borderBottom: '1px solid #f3f4f6', backgroundColor: '#f9fafb', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' },
-  cardIcon: { fontSize: '1.8rem', marginRight: '15px' },
-  cardTitle: { flex: 1, margin: 0, fontSize: '1.2rem', fontWeight: '700', color: '#111827' },
-  cardCounter: { fontSize: '1rem', fontWeight: 'bold', color: '#3b82f6' },
-  itemsList: { padding: '10px', overflowY: 'auto', minHeight: '100px' },
-  itemContainer: { display: 'flex', alignItems: 'center', padding: '12px 10px', borderRadius: '8px', cursor: 'pointer', transition: 'background-color 0.2s', position: 'relative' },
-  deleteButton: { position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) scale(0.8)', width: '24px', height: '24px', borderRadius: '12px', backgroundColor: '#ef4444', color: 'white', display: 'flex', justifyContent: 'center', alignItems: 'center', fontWeight: 'bold', opacity: '0', transition: 'opacity 0.2s, transform 0.2s', fontSize: '14px', lineHeight: '24px' },
-  itemTextContainer: { flex: 1, marginRight: '30px' },
-  itemName: { fontSize: '1rem', color: '#1f2937', margin: 0 },
-  itemNotes: { fontSize: '0.8rem', color: '#6b7280', marginTop: '2px', margin: 0 },
-  itemCheckedText: { textDecoration: 'line-through', color: '#9ca3af' },
-  checkboxBase: { width: 22, height: 22, display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: 6, borderWidth: '2px', borderStyle: 'solid', borderColor: '#d1d5db', backgroundColor: 'transparent', marginRight: 15, flexShrink: 0, transition: 'all 0.2s' },
-  checkboxChecked: { backgroundColor: '#34d399', borderColor: '#34d399' },
-  checkboxCheckmark: { color: 'white', fontWeight: 'bold', fontSize: 14 },
-  cardFooter: { borderTop: '1px solid #f3f4f6', marginTop: 'auto', padding: '10px' },
-  addItemForm: { display: 'flex', marginTop: '10px' },
-  addItemInput: { flex: 1, border: '1px solid #d1d5db', borderRadius: '8px', padding: '8px 12px', fontSize: '14px', transition: 'border-color 0.2s, box-shadow 0.2s' },
-  addItemButton: { marginLeft: '10px', padding: '8px 15px', border: 'none', borderRadius: '8px', backgroundColor: '#6b7280', color: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '14px', transition: 'background-color 0.2s' },
-  geminiButton: { width: '100%', padding: '10px 15px', border: 'none', borderRadius: '8px', backgroundColor: '#8b5cf6', color: 'white', fontWeight: '600', cursor: 'pointer', fontSize: '14px', transition: 'background-color 0.2s' },
-  aiCreatorCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)', minWidth: '320px', padding: '20px', display: 'flex', flexDirection: 'column', border: '2px dashed #a78bfa' },
-  aiCreatorDesc: { color: '#4b5563', fontSize: '14px', lineHeight: 1.6, flexGrow: 1},
-  geminiFullButton: { marginTop: '10px', width: 'auto', flexGrow: 1 },
-  modalBackdrop: { position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
-  modalContent: { backgroundColor: 'white', padding: '25px', borderRadius: '12px', width: '90%', maxWidth: '500px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)' },
-  modalTitle: { marginTop: 0, color: '#111827' },
-  suggestionList: { maxHeight: '300px', overflowY: 'auto', borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '10px 0' },
-  suggestionItem: { display: 'flex', alignItems: 'center', padding: '10px', cursor: 'pointer', borderRadius: '6px', transition: 'background-color 0.2s' },
-  modalActions: { display: 'flex', justifyContent: 'flex-end', marginTop: '20px', gap: '10px' },
-  closeButton: { padding: '10px 20px', border: '1px solid #d1d5db', borderRadius: '6px', cursor: 'pointer', backgroundColor: 'transparent', fontWeight: '600' },
-  addButton: { padding: '10px 20px', border: 'none', borderRadius: '6px', cursor: 'pointer', backgroundColor: '#22c55e', color: 'white', fontWeight: 'bold' },
-  guidesContainer: { width: '100%', padding: '25px', flexShrink: 0 },
-  guidesMainTitle: { textAlign: 'center', color: '#1f2937', marginBottom: '25px', fontSize: '2.2rem', fontWeight: '800' },
-  guideCard: { backgroundColor: '#ffffff', borderRadius: '16px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', margin: '0 auto 25px auto', maxWidth: '900px', overflow: 'hidden', border: '1px solid #e5e7eb', transition: 'all 0.3s ease-in-out' },
-  guideHeader: { display: 'flex', alignItems: 'center', padding: '20px', cursor: 'pointer', backgroundColor: 'transparent', transition: 'background-color 0.2s' },
-  guideIcon: { fontSize: '2rem', marginRight: '20px', color: '#4f46e5' },
-  guideTitle: { flex: 1, margin: 0, fontSize: '1.4rem', color: '#1f2937', fontWeight: '700' },
-  guideToggle: { fontSize: '1rem', color: '#4f46e5', fontWeight: 'bold' },
-  guideContent: { padding: '0 25px 25px 25px', lineHeight: 1.8, color: '#374151', whiteSpace: 'pre-line' },
-  guideHeading: { marginTop: '20px', marginBottom: '8px', color: '#111827', fontSize: '1.15rem', fontWeight: '700' },
-  guideParagraph: { margin: '0 0 10px 0' },
-  morseGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: '10px', marginTop: '15px' },
-  morseItem: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px', backgroundColor: '#f3f4f6', borderRadius: '4px' },
-  morseChar: { fontWeight: 'bold', fontSize: '1.1rem', color: '#1f2937' },
-  morseCode: { fontSize: '1.1rem', fontFamily: 'monospace, monospace', color: '#ef4444' },
-  galleryContainer: { display: 'flex', flexWrap: 'wrap', gap: '15px', marginTop: '10px', justifyContent: 'center' },
-  galleryFigure: { margin: 0, flex: '1 1 150px', display: 'flex', flexDirection: 'column', alignItems: 'center' },
-  galleryImage: { width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', border: '1px solid #d1d5db' },
-  galleryCaption: { marginTop: '5px', fontSize: '0.9rem', color: '#4b5563', textAlign: 'center' },
-  quizContainer: { marginTop: '25px', paddingTop: '25px', borderTop: '1px dashed #d1d5db' },
-  quizQuestion: { fontSize: '1.1rem', fontWeight: '600', margin: '0 0 15px 0', color: '#111827' },
-  quizOptions: { display: 'flex', flexDirection: 'column', gap: '10px' },
-  quizOptionButton: { padding: '12px', border: '1px solid #d1d5db', borderRadius: '8px', textAlign: 'left', cursor: 'pointer', backgroundColor: 'white', transition: 'background-color 0.2s, border-color 0.2s', fontSize: '1rem' },
-  quizButton: { padding: '12px 24px', border: 'none', borderRadius: '8px', cursor: 'pointer', backgroundColor: '#3b82f6', color: 'white', fontWeight: 'bold', fontSize: '1rem', transition: 'background-color 0.2s' },
-  quizResultsContainer: { textAlign: 'center', padding: '20px' },
-  gradeStamp: { width: '150px', height: '150px', borderRadius: '50%', border: '8px solid', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 15px auto' },
-  gradeText: { fontSize: '4rem', fontWeight: '900', fontFamily: 'monospace' },
-  exportControls: { display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'center' },
-  exportButton: { padding: '8px 16px', border: '1px solid white', backgroundColor: 'transparent', color: 'white', borderRadius: '6px', cursor: 'pointer', transition: 'background-color 0.2s', fontWeight: '600' },
-  footer: { padding: '20px', textAlign: 'center', color: '#9ca3af', backgroundColor: '#1f2937', flexShrink: 0 },
-};
-�
