@@ -19,7 +19,7 @@ const getDefaultData = () => [
   {
     id: 'cat2',
     category: "長輩包",
-    icon: "👴",
+    icon: "�",
     items: [
       { id: 'item11', name: "常備藥與藥盒", notes: "標示用法" },
       { id: 'item12', name: "老花眼鏡", notes: "" },
@@ -154,7 +154,7 @@ const survivalGuidesData = [
     {
         id: 'guide3',
         title: '摩斯密碼教學',
-        icon: '�',
+        icon: '📡',
         content: [
            { type: 'paragraph', text: '摩斯密碼是一種國際通用的求救信號。基本原則是：短音「點」(.)、長音「劃」(-)，劃的長度約為點的3倍。字母間隔為一劃長，單字間隔為三劃長。' },
            { type: 'heading', text: '國際通用求救信號 (SOS)：' },
@@ -364,7 +364,6 @@ export default function App() {
   return (<div style={styles.appContainer}><header style={styles.header}><HeaderAnimation /><div style={styles.headerContent}><h1 style={styles.title}>智慧防災準備指引</h1><div style={styles.progressContainer}><p style={styles.progressText}>總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div style={styles.progressBarContainer}><div style={{...styles.progressBar, width: `${progress * 100}%`}} /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} style={styles.mainContent}>{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section style={styles.guidesContainer}><h2 style={styles.guidesMainTitle}>生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer style={styles.footer}>© 2025 MAFTET</footer></div>);
 }
 
-// --- 樣式表 (適用於 Web) ---
 const styles = {
   appContainer: { fontFamily: '"Inter", "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif', backgroundColor: '#f0f2f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
   header: { padding: '20px', backgroundColor: '#1f2937', color: 'white', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', flexShrink: 0, position: 'relative', overflow: 'hidden' },
@@ -439,5 +438,60 @@ const styles = {
   footer: { padding: '20px', textAlign: 'center', color: '#9ca3af', backgroundColor: '#1f2937', flexShrink: 0 },
 };
 
-// ... the rest of the file remains the same
+const keyframes = `
+  @keyframes countdown-float {
+    0% { transform: translateY(0); opacity: 0; }
+    25% { opacity: 0.3; }
+    50% { transform: translateY(-15px); opacity: 0.1; }
+    75% { opacity: 0.3; }
+    100% { transform: translateY(0); opacity: 0; }
+  }
+  @keyframes stamp-animation {
+    0% { transform: scale(1.8); opacity: 0; }
+    50% { transform: scale(0.9); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+`;
+
+const printStyle = `
+  @media print {
+    body, .appContainer, .header, .footer, .guidesContainer {
+      visibility: hidden;
+    }
+    #printable-area, #printable-area * {
+      visibility: visible;
+    }
+    #printable-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+    .category-card {
+        page-break-inside: avoid;
+    }
+    .deleteButton, .cardFooter, .gemini-button {
+        display: none !important;
+    }
+  }
+`;
+
+const hoverStyle = `
+  .item-container:hover .deleteButton { opacity: 1 !important; transform: translateY(-50%) scale(1) !important; } 
+  .item-container:hover { background-color: #f9fafb; } 
+  .suggestionItem:hover { background-color: #f3f4f6; } 
+  .gemini-button:hover:not(:disabled) { background-color: #a78bfa; }
+  .guide-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.07); }
+  .quiz-option-button:hover { background-color: #f3f4f6; border-color: #a78bfa; }
+  .quiz-button:hover { background-color: #60a5fa; }
+  .export-button:hover { background-color: rgba(255,255,255,0.1); }
+  .addItemInput:focus { border-color: #a78bfa; box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.3); outline: none;}
+  .addItemButton:hover { background-color: #4b5563; }
+`;
+if (!document.getElementById('app-dynamic-styles')) {
+    const styleSheet = document.createElement("style");
+    styleSheet.id = 'app-dynamic-styles';
+    styleSheet.innerText = keyframes + printStyle + hoverStyle;
+    document.head.appendChild(styleSheet);
+}
 �
