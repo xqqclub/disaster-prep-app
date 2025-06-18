@@ -67,7 +67,7 @@ const survivalGuidesData = [
     {
         id: 'guide0',
         title: '核心觀念：物資準備教學',
-        icon: '🥫',
+        icon: '�',
         content: [
             { type: 'heading', text: '新手常犯錯：錯把「日常食物」當成「戰備糧」' },
             { type: 'paragraph', text: '很多玩家看到自家冰箱滿滿的就覺得自己滿等了，但你沒理解到系統機制：\n戰時 = 限水限電模式開啟，所有靠電力生存的物資都會被自動卸載！\n\n你餐廳的食材、家裡冷凍的肉品，都是高危易腐資源，停電三天直接報銷。戰時你只會得到一堆「腐爛物資 ×99」。' },
@@ -208,16 +208,98 @@ const HeaderAnimation = () => {
                     left: `${Math.random() * 100}%`,
                     fontSize: `${Math.random() * 16 + 8}px`,
                     animationDelay: `${Math.random() * 5}s`,
-                }}>{timer.value}</span>
+                }}>
+                    {timer.value}
+                </span>
             ))}
         </div>
     );
 };
-const CustomCheckbox = ({ isChecked, onPress }) => ( <div className={`checkbox-base ${isChecked ? 'checkbox-checked' : ''}`} onClick={(e) => { e.stopPropagation(); onPress(); }}>{isChecked && <span className="checkbox-checkmark">✓</span>}</div> );
-const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => ( <div className="item-container" onClick={() => onToggle(item.id)}> <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} /> <div className="item-text-container"><p className={`item-name ${isChecked ? 'item-checked-text' : ''}`}>{item.name}</p>{item.notes ? <p className={`item-notes ${isChecked ? 'item-checked-text' : ''}`}>{item.notes}</p> : null}</div> <div className="delete-button" onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div></div> );
-const AddItemForm = ({ onAddItem }) => { const [newItemName, setNewItemName] = useState(''); const handleAdd = () => { if (newItemName.trim()) { onAddItem(newItemName.trim()); setNewItemName(''); } }; return (<div className="add-item-form"><input type="text" className="add-item-input" placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/><button className="add-item-button" onClick={handleAdd}>新增</button></div>);};
-const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => { const { id, category, icon, items } = categoryData; const preparedCount = items.filter(item => checkedItems.has(item.id)).length; const totalCount = items.length; const isCompleted = totalCount > 0 && preparedCount === totalCount; return (<div className={`category-card ${isCompleted ? 'card-completed' : ''}`}><div className="card-header"><span className="card-icon">{icon}</span><h2 className="card-title">{category}</h2><span className="card-counter">{`${preparedCount} / ${totalCount}`}</span></div><div className="items-list">{items.map(item => (<ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />))}</div><div className="card-footer"><button className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}> {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'} </button><AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} /></div></div>);};
-const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => { const [newCategoryName, setNewItemName] = useState(''); const handleGenerate = () => { if(newCategoryName.trim()){ onGenerate(newCategoryName.trim()); setNewItemName(''); } }; return (<div className="category-card ai-creator-card"><h2 className="card-title"><span className="card-icon">🤖</span> 使用 AI 建立新的防災包</h2><p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p><div className="add-item-form"><input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} /><button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}> {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'} </button></div></div>)};
+
+const CustomCheckbox = ({ isChecked, onPress }) => (
+    <div className={`checkbox-base ${isChecked ? 'checkbox-checked' : ''}`} onClick={(e) => { e.stopPropagation(); onPress(); }}>
+        {isChecked && <span className="checkbox-checkmark">✓</span>}
+    </div>
+);
+
+const ChecklistItem = ({ item, isChecked, onToggle, onDelete }) => (
+    <div className="item-container" onClick={() => onToggle(item.id)}>
+        <CustomCheckbox isChecked={isChecked} onPress={() => onToggle(item.id)} />
+        <div className="item-text-container">
+            <p className={`item-name ${isChecked ? 'item-checked-text' : ''}`}>{item.name}</p>
+            {item.notes ? <p className={`item-notes ${isChecked ? 'item-checked-text' : ''}`}>{item.notes}</p> : null}
+        </div>
+        <div className="delete-button" onClick={(e) => { e.stopPropagation(); onDelete(item.id); }}>✕</div>
+    </div>
+);
+
+const AddItemForm = ({ onAddItem }) => {
+    const [newItemName, setNewItemName] = useState('');
+    const handleAdd = () => {
+        if (newItemName.trim()) {
+            onAddItem(newItemName.trim());
+            setNewItemName('');
+        }
+    };
+    return (
+        <div className="add-item-form">
+            <input type="text" className="add-item-input" placeholder="手動新增物品..." value={newItemName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleAdd()}/>
+            <button className="add-item-button" onClick={handleAdd}>新增</button>
+        </div>
+    );
+};
+
+const CategoryCard = ({ categoryData, checkedItems, onToggleItem, onAddItem, onDeleteItem, onGetSuggestions, isGeminiLoading }) => {
+    const { id, category, icon, items } = categoryData;
+    const preparedCount = items.filter(item => checkedItems.has(item.id)).length;
+    const totalCount = items.length;
+    const isCompleted = totalCount > 0 && preparedCount === totalCount;
+    return (
+        <div className={`category-card ${isCompleted ? 'card-completed' : ''}`}>
+            <div className="card-header">
+                <span className="card-icon">{icon}</span>
+                <h2 className="card-title">{category}</h2>
+                <span className="card-counter">{`${preparedCount} / ${totalCount}`}</span>
+            </div>
+            <div className="items-list">
+                {items.map(item => (
+                    <ChecklistItem key={item.id} item={item} isChecked={checkedItems.has(item.id)} onToggle={onToggleItem} onDelete={(itemId) => onDeleteItem(id, itemId)} />
+                ))}
+            </div>
+            <div className="card-footer">
+                <button className="gemini-button" onClick={() => onGetSuggestions(id)} disabled={isGeminiLoading}>
+                    {isGeminiLoading ? '思考中...' : '✨ 取得智慧建議'}
+                </button>
+                <AddItemForm onAddItem={(itemName) => onAddItem(id, itemName)} />
+            </div>
+        </div>
+    );
+};
+
+const AiCategoryCreator = ({ onGenerate, isGeminiLoading }) => {
+    const [newCategoryName, setNewItemName] = useState('');
+    const handleGenerate = () => {
+        if(newCategoryName.trim()){
+            onGenerate(newCategoryName.trim());
+            setNewItemName('');
+        }
+    };
+    return (
+        <div className="category-card ai-creator-card">
+            <h2 className="card-title">
+                <span className="card-icon">🤖</span> 使用 AI 建立新的防災包
+            </h2>
+            <p className="ai-creator-desc">輸入您想建立的防災包類型（例如：「車用急救包」、「颱風應對包」），讓 Gemini 為您生成建議清單！</p>
+            <div className="add-item-form">
+                <input type="text" className="add-item-input" placeholder="輸入防災包類型..." value={newCategoryName} onChange={(e) => setNewItemName(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleGenerate()} />
+                <button className="gemini-button gemini-full-button" onClick={handleGenerate} disabled={isGeminiLoading}>
+                    {isGeminiLoading ? '生成中...' : '✨ AI 生成清單'}
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) => {
     const [selected, setSelected] = useState(new Set());
     
@@ -243,10 +325,52 @@ const SuggestionModal = ({ show, suggestions, onClose, onAdd, categoryName }) =>
         onClose();
     };
 
-    return (<div className="modal-backdrop"><div className="modal-content"><h2 className="modal-title">給「{categoryName}」的智慧建議</h2><div className="suggestion-list">{suggestions.map((s, i) => (<div key={i} className="suggestion-item" onClick={() => handleToggle(s)}><CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} /><span>{s}</span></div>))}</div><div className="modal-actions"><button className="close-button" onClick={onClose}>取消</button><button className="add-button" onClick={handleAddSelected}>加入選取項目</button></div></div></div>);
+    return (
+        <div className="modal-backdrop">
+            <div className="modal-content">
+                <h2 className="modal-title">給「{categoryName}」的智慧建議</h2>
+                <div className="suggestion-list">
+                    {suggestions.map((s, i) => (
+                        <div key={i} className="suggestion-item" onClick={() => handleToggle(s)}>
+                            <CustomCheckbox isChecked={selected.has(s)} onPress={() => handleToggle(s)} />
+                            <span>{s}</span>
+                        </div>
+                    ))}
+                </div>
+                <div className="modal-actions">
+                    <button className="close-button" onClick={onClose}>取消</button>
+                    <button className="add-button" onClick={handleAddSelected}>加入選取項目</button>
+                </div>
+            </div>
+        </div>
+    );
 };
-const MorseCodeTable = () => { const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' }; return (<div className="morse-grid">{Object.entries(morseAlphabet).map(([char, code]) => (<div key={char} className="morse-item"><strong className="morse-char">{char}</strong><span className="morse-code">{code}</span></div>))}</div>);};
-const ImageGallery = ({ images }) => (<div className="gallery-container">{images.map((img, index) => (<figure key={index} className="gallery-figure"><img src={img.src} alt={img.caption} className="gallery-image" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} /><figcaption className="gallery-caption">{img.caption}</figcaption></figure>))}</div>);
+
+const MorseCodeTable = () => {
+    const morseAlphabet = { 'A':'.-', 'B':'-...', 'C':'-.-.', 'D':'-..', 'E':'.', 'F':'..-.', 'G':'--.', 'H':'....', 'I':'..', 'J':'.---', 'K':'-.-', 'L':'.-..', 'M':'--', 'N':'-.', 'O':'---', 'P':'.--.', 'Q':'--.-', 'R':'.-.', 'S':'...', 'T':'-', 'U':'..-', 'V':'...-', 'W':'.--', 'X':'-..-', 'Y':'-.--', 'Z':'--..', '1':'.----', '2':'..---', '3':'...--', '4':'....-', '5':'.....', '6':'-....', '7':'--...', '8':'---..', '9':'----.', '0':'-----' };
+    return (
+        <div className="morse-grid">
+            {Object.entries(morseAlphabet).map(([char, code]) => (
+                <div key={char} className="morse-item">
+                    <strong className="morse-char">{char}</strong>
+                    <span className="morse-code">{code}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const ImageGallery = ({ images }) => (
+    <div className="gallery-container">
+        {images.map((img, index) => (
+            <figure key={index} className="gallery-figure">
+                <img src={img.src} alt={img.caption} className="gallery-image" onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x300/eee/ccc?text=Image+Not+Found'; }} />
+                <figcaption className="gallery-caption">{img.caption}</figcaption>
+            </figure>
+        ))}
+    </div>
+);
+
 const QuizResults = ({ score, total, onRestart }) => {
     const percentage = (score / total) * 100;
     const calculateGrade = (p) => {
@@ -270,6 +394,7 @@ const QuizResults = ({ score, total, onRestart }) => {
         </div>
     );
 };
+
 const QuizSection = ({ quizData }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(null);
     const [userAnswers, setUserAnswers] = useState({});
@@ -295,9 +420,45 @@ const QuizSection = ({ quizData }) => {
     if (currentQuestionIndex === null) return (<div className="quiz-container"><button onClick={startQuiz} className="quiz-button">開始知識測驗</button></div>);
     
     const question = quizData[currentQuestionIndex];
-    return (<div className="quiz-container"><h4>問題 {currentQuestionIndex + 1}/{quizData.length}</h4><p className="quiz-question">{question.question}</p><div className="quiz-options">{question.options.map((option, index) => (<button key={index} onClick={() => handleAnswer(index)} className="quiz-option-button">{option}</button>))}</div></div>);
+    return (
+        <div className="quiz-container">
+            <h4>問題 {currentQuestionIndex + 1}/{quizData.length}</h4>
+            <p className="quiz-question">{question.question}</p>
+            <div className="quiz-options">
+                {question.options.map((option, index) => (
+                    <button key={index} onClick={() => handleAnswer(index)} className="quiz-option-button">{option}</button>
+                ))}
+            </div>
+        </div>
+    );
 };
-const SurvivalGuideSection = ({ guide }) => { const [isExpanded, setIsExpanded] = useState(false); const toggleExpand = () => setIsExpanded(!isExpanded); return (<div className="guide-card"><div className="guide-header" onClick={toggleExpand}><span className="guide-icon">{guide.icon}</span><h3 className="guide-title">{guide.title}</h3><span className="guide-toggle">{isExpanded ? '收合' : '展開學習'}</span></div>{isExpanded && (<div className="guide-content">{guide.content.map((block, index) => { if (block.type === 'heading') return <h4 key={index} className="guide-heading">{block.text}</h4>; if (block.type === 'paragraph') return <p key={index} className="guide-paragraph">{block.text}</p>; if (block.type === 'morse_table') return <MorseCodeTable key={index} />; if (block.type === 'images') return <ImageGallery key={index} images={block.images} />; return null;})}{guide.quiz && <QuizSection quizData={guide.quiz} />}</div>)}</div>);};
+
+const SurvivalGuideSection = ({ guide }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const toggleExpand = () => setIsExpanded(!isExpanded);
+    return (
+        <div className="guide-card">
+            <div className="guide-header" onClick={toggleExpand}>
+                <span className="guide-icon">{guide.icon}</span>
+                <h3 className="guide-title">{guide.title}</h3>
+                <span className="guide-toggle">{isExpanded ? '收合' : '展開學習'}</span>
+            </div>
+            {isExpanded && (
+                <div className="guide-content">
+                    {guide.content.map((block, index) => {
+                        if (block.type === 'heading') return <h4 key={index} className="guide-heading">{block.text}</h4>;
+                        if (block.type === 'paragraph') return <p key={index} className="guide-paragraph">{block.text}</p>;
+                        if (block.type === 'morse_table') return <MorseCodeTable key={index} />;
+                        if (block.type === 'images') return <ImageGallery key={index} images={block.images} />;
+                        return null;
+                    })}
+                    {guide.quiz && <QuizSection quizData={guide.quiz} />}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const ExportControls = ({ targetRef }) => {
     const [isExporting, setIsExporting] = useState(false);
 
@@ -346,16 +507,191 @@ export default function App() {
   const [suggestionModal, setSuggestionModal] = useState({ show: false, categoryId: null, categoryName: '', suggestions: [] });
   const printableRef = React.useRef(null);
 
-  const callGeminiAPI = async (prompt, jsonSchema = null) => { try { const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] }; if(jsonSchema) payload.generationConfig = { responseMimeType: "application/json", responseSchema: jsonSchema }; const apiKey = process.env.REACT_APP_GEMINI_API_KEY || ""; const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`; const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); if (!response.ok) throw new Error(`API call failed with status: ${response.status}`); const result = await response.json(); if (result.candidates?.[0]?.content?.parts?.[0]) return result.candidates[0].content.parts[0].text; throw new Error("Invalid response structure from Gemini API"); } catch (error) { console.error("Gemini API call error:", error); alert(`與 Gemini 溝通時發生錯誤: ${error.message}`); return null; }};
-  useEffect(() => { try { const storedData = localStorage.getItem('disasterPrepData'); setChecklistData(storedData ? JSON.parse(storedData) : getDefaultData()); const storedCheckedItems = localStorage.getItem('disasterPrepCheckedItems'); if (storedCheckedItems) setCheckedItems(new Set(JSON.parse(storedCheckedItems))); } catch (e) { console.error("Failed to load data from localStorage", e); setChecklistData(getDefaultData()); }}, []);
-  useEffect(() => { if(checklistData.length > 0) localStorage.setItem('disasterPrepData', JSON.stringify(checklistData)); }, [checklistData]);
-  useEffect(() => { localStorage.setItem('disasterPrepCheckedItems', JSON.stringify(Array.from(checkedItems))); }, [checkedItems]);
-  const handleToggleItem = useCallback((itemId) => { setCheckedItems(prev => { const newSet = new Set(prev); if (newSet.has(itemId)) newSet.delete(itemId); else newSet.add(itemId); return newSet; }); }, []);
-  const handleAddItem = useCallback((categoryId, itemName) => { setChecklistData(prevData => prevData.map(cat => cat.id === categoryId ? { ...cat, items: [...cat.items, { id: `item${Date.now()}`, name: itemName, notes: "" }] } : cat)); }, []);
-  const handleDeleteItem = useCallback((categoryId, itemId) => { setChecklistData(prevData => prevData.map(cat => cat.id === categoryId ? { ...cat, items: cat.items.filter(item => item.id !== itemId) } : cat)); setCheckedItems(prev => { const newSet = new Set(prev); newSet.delete(itemId); return newSet; }); }, []);
-  const handleGetSuggestions = async (categoryId) => { const category = checklistData.find(c => c.id === categoryId); if(!category) return; setLoadingState(s => ({...s, suggestions: true})); const prompt = `針對「${category.category}」這個防災準備類別，我目前已經準備了「${category.items.map(item => item.name).join(', ')}」。請根據這些項目，用繁體中文建議5個我可能遺漏掉的其它重要物品。請只回傳一個簡單的、用換行符號分隔的物品清單，不要有編號或任何多餘的文字。`; const resultText = await callGeminiAPI(prompt); setLoadingState(s => ({...s, suggestions: false})); if(resultText) { const suggestions = resultText.split('\n').filter(s => s.trim() !== ''); setSuggestionModal({ show: true, categoryId, categoryName: category.category, suggestions }); }};
-  const handleAddSuggestions = useCallback((itemsToAdd) => { if(!suggestionModal.categoryId) return; setChecklistData(prevData => prevData.map(cat => cat.id === suggestionModal.categoryId ? { ...cat, items: [...cat.items, ...itemsToAdd.map(name => ({ id: `item${Date.now()}_${name}`, name, notes: "AI建議" }))] } : cat));}, [suggestionModal.categoryId]);
-  const handleCreateCategoryWithAI = async (categoryName) => { setLoadingState(s => ({...s, creator: true})); const schema = { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "STRING" }}}, required: ["items"]}; const prompt = `請為「${categoryName}」這個防災準備類別，生成一個包含5到8個建議物品的JSON清單。`; const resultJson = await callGeminiAPI(prompt, schema); setLoadingState(s => ({...s, creator: false})); if(resultJson) { try { const parsed = JSON.parse(resultJson); if(parsed.items && Array.isArray(parsed.items)) { setChecklistData(prev => [...prev, { id: `cat${Date.now()}`, category: categoryName, icon: '💡', items: parsed.items.map((name, i) => ({ id: `item${Date.now()}_${i}`, name, notes: "AI建立" }))}]); } } catch(e) { console.error("Failed to parse AI response:", e); alert("AI回傳的資料格式有誤，請稍後再試。"); }}};
-  const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0); const preparedItemsCount = checkedItems.size; const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
-  return (<div className="app-container"><header className="header"><HeaderAnimation /><div className="header-content"><h1 className="title">AI 智慧防災準備指引</h1><div className="progress-container"><p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p><div className="progress-bar-container"><div style={{width: `${progress * 100}%`}} className="progress-bar" /></div></div><ExportControls targetRef={printableRef} /></div></header><main id="printable-area" ref={printableRef} className="main-content">{checklistData.map(categoryData => ( <CategoryCard key={categoryData.id} categoryData={categoryData} checkedItems={checkedItems} onToggleItem={handleToggleItem} onAddItem={handleAddItem} onDeleteItem={handleDeleteItem} onGetSuggestions={handleGetSuggestions} isGeminiLoading={loadingState.suggestions} /> ))}<AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} /></main><section className="guides-container"><h2 className="guides-main-title">生存技巧學習</h2>{survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}</section><SuggestionModal show={suggestionModal.show} suggestions={suggestionModal.suggestions} categoryName={suggestionModal.categoryName} onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })} onAdd={handleAddSuggestions} /><footer className="footer">© 2025 MAFTET</footer></div>);
+  const callGeminiAPI = async (prompt, jsonSchema = null) => {
+      try {
+          const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+          if(jsonSchema) {
+              payload.generationConfig = {
+                  responseMimeType: "application/json",
+                  responseSchema: jsonSchema
+              };
+          }
+          const apiKey = process.env.REACT_APP_GEMINI_API_KEY || "";
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+          const response = await fetch(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+          const result = await response.json();
+          if (result.candidates?.[0]?.content?.parts?.[0]) {
+              return result.candidates[0].content.parts[0].text;
+          }
+          throw new Error("Invalid response structure from Gemini API");
+      } catch (error) {
+          console.error("Gemini API call error:", error);
+          alert(`與 Gemini 溝通時發生錯誤: ${error.message}`);
+          return null;
+      }
+  };
+
+  useEffect(() => {
+      try {
+          const storedData = localStorage.getItem('disasterPrepData');
+          setChecklistData(storedData ? JSON.parse(storedData) : getDefaultData());
+          const storedCheckedItems = localStorage.getItem('disasterPrepCheckedItems');
+          if (storedCheckedItems) {
+              setCheckedItems(new Set(JSON.parse(storedCheckedItems)));
+          }
+      } catch (e) {
+          console.error("Failed to load data from localStorage", e);
+          setChecklistData(getDefaultData());
+      }
+  }, []);
+
+  useEffect(() => {
+      if(checklistData.length > 0) {
+          localStorage.setItem('disasterPrepData', JSON.stringify(checklistData));
+      }
+  }, [checklistData]);
+
+  useEffect(() => {
+      localStorage.setItem('disasterPrepCheckedItems', JSON.stringify(Array.from(checkedItems)));
+  }, [checkedItems]);
+
+  const handleToggleItem = useCallback((itemId) => {
+      setCheckedItems(prev => {
+          const newSet = new Set(prev);
+          if (newSet.has(itemId)) {
+              newSet.delete(itemId);
+          } else {
+              newSet.add(itemId);
+          }
+          return newSet;
+      });
+  }, []);
+
+  const handleAddItem = useCallback((categoryId, itemName) => {
+      setChecklistData(prevData =>
+          prevData.map(cat =>
+              cat.id === categoryId
+                  ? { ...cat, items: [...cat.items, { id: `item${Date.now()}`, name: itemName, notes: "" }] }
+                  : cat
+          )
+      );
+  }, []);
+
+  const handleDeleteItem = useCallback((categoryId, itemId) => {
+      setChecklistData(prevData =>
+          prevData.map(cat =>
+              cat.id === categoryId
+                  ? { ...cat, items: cat.items.filter(item => item.id !== itemId) }
+                  : cat
+          )
+      );
+      setCheckedItems(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(itemId);
+          return newSet;
+      });
+  }, []);
+
+  const handleGetSuggestions = async (categoryId) => {
+      const category = checklistData.find(c => c.id === categoryId);
+      if(!category) return;
+      setLoadingState(s => ({...s, suggestions: true}));
+      const prompt = `針對「${category.category}」這個防災準備類別，我目前已經準備了「${category.items.map(item => item.name).join(', ')}」。請根據這些項目，用繁體中文建議5個我可能遺漏掉的其它重要物品。請只回傳一個簡單的、用換行符號分隔的物品清單，不要有編號或任何多餘的文字。`;
+      const resultText = await callGeminiAPI(prompt);
+      setLoadingState(s => ({...s, suggestions: false}));
+      if(resultText) {
+          const suggestions = resultText.split('\n').filter(s => s.trim() !== '');
+          setSuggestionModal({ show: true, categoryId, categoryName: category.category, suggestions });
+      }
+  };
+
+  const handleAddSuggestions = useCallback((itemsToAdd) => {
+      if(!suggestionModal.categoryId) return;
+      setChecklistData(prevData =>
+          prevData.map(cat =>
+              cat.id === suggestionModal.categoryId
+                  ? { ...cat, items: [...cat.items, ...itemsToAdd.map(name => ({ id: `item${Date.now()}_${name}`, name, notes: "AI建議" }))] }
+                  : cat
+          )
+      );
+  }, [suggestionModal.categoryId]);
+
+  const handleCreateCategoryWithAI = async (categoryName) => {
+      setLoadingState(s => ({...s, creator: true}));
+      const schema = { type: "OBJECT", properties: { items: { type: "ARRAY", items: { type: "STRING" }}}, required: ["items"]};
+      const prompt = `請為「${categoryName}」這個防災準備類別，生成一個包含5到8個建議物品的JSON清單。`;
+      const resultJson = await callGeminiAPI(prompt, schema);
+      setLoadingState(s => ({...s, creator: false}));
+      if(resultJson) {
+          try {
+              const parsed = JSON.parse(resultJson);
+              if(parsed.items && Array.isArray(parsed.items)) {
+                  setChecklistData(prev => [...prev, {
+                      id: `cat${Date.now()}`,
+                      category: categoryName,
+                      icon: '💡',
+                      items: parsed.items.map((name, i) => ({ id: `item${Date.now()}_${i}`, name, notes: "AI建立" }))
+                  }]);
+              }
+          } catch(e) {
+              console.error("Failed to parse AI response:", e);
+              alert("AI回傳的資料格式有誤，請稍後再試。");
+          }
+      }
+  };
+
+  const totalItems = checklistData.reduce((sum, cat) => sum + cat.items.length, 0);
+  const preparedItemsCount = checkedItems.size;
+  const progress = totalItems > 0 ? preparedItemsCount / totalItems : 0;
+
+  return (
+      <div className="app-container">
+          <header className="header">
+              <HeaderAnimation />
+              <div className="header-content">
+                  <h1 className="title">AI 智慧防災準備指引</h1>
+                  <div className="progress-container">
+                      <p className="progress-text">總進度: {preparedItemsCount} / {totalItems} ({Math.round(progress * 100)}%)</p>
+                      <div className="progress-bar-container">
+                          <div style={{width: `${progress * 100}%`}} className="progress-bar" />
+                      </div>
+                  </div>
+                  <ExportControls targetRef={printableRef} />
+              </div>
+          </header>
+          <main id="printable-area" ref={printableRef} className="main-content">
+              {checklistData.map(categoryData => (
+                  <CategoryCard
+                      key={categoryData.id}
+                      categoryData={categoryData}
+                      checkedItems={checkedItems}
+                      onToggleItem={handleToggleItem}
+                      onAddItem={handleAddItem}
+                      onDeleteItem={handleDeleteItem}
+                      onGetSuggestions={handleGetSuggestions}
+                      isGeminiLoading={loadingState.suggestions}
+                  />
+              ))}
+              <AiCategoryCreator onGenerate={handleCreateCategoryWithAI} isGeminiLoading={loadingState.creator} />
+          </main>
+          <section className="guides-container">
+              <h2 className="guides-main-title">生存技巧學習</h2>
+              {survivalGuidesData.map(guide => ( <SurvivalGuideSection key={guide.id} guide={guide} /> ))}
+          </section>
+          <SuggestionModal
+              show={suggestionModal.show}
+              suggestions={suggestionModal.suggestions}
+              categoryName={suggestionModal.categoryName}
+              onClose={() => setSuggestionModal({ show: false, categoryId: null, categoryName:'', suggestions: [] })}
+              onAdd={handleAddSuggestions}
+          />
+          <footer className="footer">© 2025 MAFTET</footer>
+      </div>
+  );
 }
+�
