@@ -138,9 +138,9 @@ const survivalGuidesData = [
             { type: 'heading', text: '常見可食用植物（台灣郊外）：' },
             { type: 'paragraph', text: '警告：除非您100%確定，否則切勿食用任何野生植物！以下僅為參考，務必與專家確認。' },
             { type: 'images', images: [
-                { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Amaranthus_viridis_in_AP_2.jpg/800px-Amaranthus_viridis_in_AP_2.jpg', caption: '野莧菜 (刺莧)' },
-                { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Solanum_nigrum_-_Köhler–s_Medizinal-Pflanzen-123.jpg/800px-Solanum_nigrum_-_Köhler–s_Medizinal-Pflanzen-123.jpg', caption: '龍葵 (黑甜仔)' },
-                { src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Crassocephalum_crepidioides_flower_head.jpg/800px-Crassocephalum_crepidioides_flower_head.jpg', caption: '昭和草' },
+                { src: 'https://ws.kinmen.gov.tw/001/Upload/321/attachment/944a7394-0ec9-46a9-9603-0ce9352d3caa.jpg', caption: '野莧菜 (刺莧)' },
+                { src: 'https://kmweb.moa.gov.tw/files/IMITA_Gallery/166/77c38b418e_m.jpg', caption: '龍葵 (黑甜仔)' },
+                { src: 'https://c2.staticflickr.com/8/7823/46440633894_2551ede831_b.jpg', caption: '昭和草' },
             ]},
         ],
         quiz: [
